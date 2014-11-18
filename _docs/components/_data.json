@@ -11,7 +11,6 @@
     "attributes": {
       "options | Array": [ [], [], "An array with the possible select options" ],
       "label | String": [ "", "", "A label which appears on the dropdown when no item is selected." ],
-      "type | String": [ "selection", "search selection", "The type of dropdown." ],
       "on | String": [ "click", "hover", "On which event to show/hide the dropdown" ],
       "name | String": []
     },

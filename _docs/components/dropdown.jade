@@ -32,12 +32,12 @@ div
    .ui.button(v-on="click: $.dropdown.$show") $show()
 
 
-// Types docs
+// Attributes docs
 
-h1.ui.dividing.header Types
+h1.ui.dividing.header Attributes
 
-p By specifying the 'type' attribute you can change the type of the Dropdown the same way
-   | you would normally do it in Semantic-UI by using class names
+h2: strong type {String}
+p Change the type of the Dropdown the same way you would normally do it in Semantic-UI by using class names
 p 'type' is simply a list of classes which are appended to the dropdown
 
 h4 Dropdown (default)
@@ -77,7 +77,27 @@ span The gender of this user is
    ```
 .ui.divider
 
+h2: strong label | {String}
+p A label which appears on the dropdown when no option is selected
+
+h2: strong on | {String} Default: 'click'
+p Event used to trigger dropdown 'hover' or 'click'
+
+h2: strong options | {Array}
+p options should be a keypath/expression that points to an Array to use as the dropdown options
+
+h2: strong name | {String}
+p= 'sets the name of the <input /> inside the dropdown'
+
 
 // Content
 
 h1.ui.dividing.header= 'Customizing the <content>'
+
+p If you need to customize the template of this module, the following partials are replacable:
+   | content(select=".menu")
+   | content(select=".item")
+
+- var component = current.source
+- var templatePath = 'https://github.com/vueui/vue-ui/blob/master/components/' + component + '/' + component + '.jade'
+a(href="#{ templatePath }") #{ component }.jade
