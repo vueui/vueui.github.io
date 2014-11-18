@@ -1,0 +1,11 @@
+
+h1 Behavior
+p A checkbox instance has the following methods
+
+mixin behavior(method)
+    .ui.button(v-on="click: $.checkbox['#{ method }']") #{ method }()
+
+- var methods = [ '$toggle', '$check', '$uncheck', '$isChecked', '$isRadio' ]
+
+each method in methods
+    +behavior(method)

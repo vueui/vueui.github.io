@@ -1,0 +1,43 @@
+
+h1.ui.dividing.header Attributes
+
+h2: strong class {String}
+p Any Checkbox class available in Semantic-UI which changes the styling is acceptable
+
+div
+    :markdown
+        ```html
+        <ui-checkbox class="slider" label="Make my profile visible"></ui-checkbox>
+        ```
+    ui-checkbox(class="slider" label="Make my profile visible")
+    .ui.divider
+div
+    :markdown
+        ```html
+        <ui-checkbox class="radio" label="Choose me!"></ui-checkbox>
+        ```
+    ui-checkbox(class="radio" label="Choose me!")
+    .ui.divider
+div
+    :markdown
+        ```html
+        <ui-checkbox class="read-only" label="You can only read me!"></ui-checkbox>
+        ```
+    ui-checkbox(class="read-only" label="You can only read me!")
+    .ui.divider
+
+h2: strong label {String}
+p Text which appears to the right of the checkbox/radio to give a hint what it is about
+
+h2: strong value {String}
+p Initialize a radio checkbox with a value. If no label is specified, value will take its place in the template
+
+h2: strong checked
+p If this attribute is specified, without any value, the checkbox will be initialized in the 'checked' state
+div
+    :markdown
+        ```html
+        <ui-checkbox label="I'm checked!" checked></ui-checkbox>
+        ```
+    ui-checkbox(label="I'm checked!" checked)
+    .ui.divider
