@@ -45,7 +45,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	window.app = new Vue({
+	window.dropdown = new Vue({
 	    el: '#app',
 	    data: {
 	        selectOptions: [

@@ -13,8 +13,9 @@ module.exports = {
         rating: './rating',
         sidebar: './sidebar'
     },
+
     output: {
-        path: path.join(__dirname, '../components/examples'),
+        path: path.join(__dirname, '../../components/examples'),
         filename: "[name].js"
     },
 

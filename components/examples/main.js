@@ -256,7 +256,7 @@
 	 * Export component definition
 	 */
 
-	module.exports = __webpack_require__(32);
+	module.exports = __webpack_require__(28);
 
 /***/ },
 /* 6 */
@@ -278,7 +278,7 @@
 	 * Export component definition
 	 */
 
-	module.exports = __webpack_require__(28);
+	module.exports = __webpack_require__(30);
 
 /***/ },
 /* 8 */
@@ -289,7 +289,7 @@
 	 * Export component definition
 	 */
 
-	module.exports = __webpack_require__(30);
+	module.exports = __webpack_require__(31);
 
 /***/ },
 /* 9 */
@@ -300,14 +300,14 @@
 	 * Load the CSS for this component
 	 */
 
-	__webpack_require__(70);
+	__webpack_require__(71);
 
 
 	/**
 	 * Export component definition
 	 */
 
-	module.exports = __webpack_require__(31);
+	module.exports = __webpack_require__(32);
 
 
 /***/ },
@@ -319,7 +319,7 @@
 	 * Load the CSS for this component
 	 */
 
-	__webpack_require__(72);
+	__webpack_require__(73);
 
 
 	/**
@@ -344,21 +344,21 @@
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var lang   = __webpack_require__(38)
+	var lang   = __webpack_require__(35)
 	var extend = lang.extend
 
 	extend(exports, lang)
+	extend(exports, __webpack_require__(36))
+	extend(exports, __webpack_require__(37))
+	extend(exports, __webpack_require__(38))
 	extend(exports, __webpack_require__(39))
-	extend(exports, __webpack_require__(40))
-	extend(exports, __webpack_require__(41))
-	extend(exports, __webpack_require__(42))
 
 /***/ },
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var mergeOptions = __webpack_require__(35)
+	var mergeOptions = __webpack_require__(40)
 
 	/**
 	 * Expose useful internals
@@ -366,7 +366,7 @@
 
 	exports.util       = _
 	exports.nextTick   = _.nextTick
-	exports.config     = __webpack_require__(36)
+	exports.config     = __webpack_require__(41)
 
 	/**
 	 * Each instance constructor, including Vue, has a unique
@@ -496,10 +496,11 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var Watcher = __webpack_require__(37)
-	var textParser = __webpack_require__(62)
-	var dirParser = __webpack_require__(63)
-	var expParser = __webpack_require__(64)
+	var Watcher = __webpack_require__(42)
+	var Path = __webpack_require__(62)
+	var textParser = __webpack_require__(63)
+	var dirParser = __webpack_require__(64)
+	var expParser = __webpack_require__(65)
 	var filterRE = /[^|]\|[^|]/
 
 	/**
@@ -643,11 +644,13 @@
 	 * so that it is easier to inspect in console.
 	 * This method assumes console is available.
 	 *
-	 * @param {String} [key]
+	 * @param {String} [path]
 	 */
 
-	exports.$log = function (key) {
-	  var data = this[key || '_data']
+	exports.$log = function (path) {
+	  var data = path
+	    ? Path.get(this, path)
+	    : this._data
 	  console.log(JSON.parse(JSON.stringify(data)))
 	}
 
@@ -656,7 +659,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var transition = __webpack_require__(65)
+	var transition = __webpack_require__(66)
 
 	/**
 	 * Append instance to target
@@ -1078,7 +1081,10 @@
 	    }
 	    ChildVue = ctors[BaseCtor.cid]
 	    if (!ChildVue) {
-	      var className = BaseCtor.name || 'VueComponent'
+	      var optionName = BaseCtor.options.name
+	      var className = optionName
+	        ? _.camelize(optionName, true)
+	        : 'VueComponent'
 	      ChildVue = new Function(
 	        'return function ' + className + ' (options) {' +
 	        'this.constructor = ' + className + ';' +
@@ -1106,7 +1112,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var compile = __webpack_require__(66)
+	var compile = __webpack_require__(67)
 
 	/**
 	 * Set instance target element and kick off the compilation
@@ -1166,15 +1172,11 @@
 	 */
 
 	exports.$destroy = function (remove) {
-	  if (this._isDestroyed) {
+	  if (this._isBeingDestroyed) {
 	    return
 	  }
 	  this._callHook('beforeDestroy')
 	  this._isBeingDestroyed = true
-	  // remove DOM element
-	  if (remove && this.$el) {
-	    this.$remove()
-	  }
 	  var i
 	  // remove self from parent. only necessary
 	  // if parent is not being destroyed as well.
@@ -1200,27 +1202,47 @@
 	  for (i in this._userWatchers) {
 	    this._userWatchers[i].teardown()
 	  }
-	  // clean up
+	  // remove reference to self on $el
 	  if (this.$el) {
 	    this.$el.__vue__ = null
 	  }
+	  // remove DOM element
+	  var self = this
+	  if (remove && this.$el) {
+	    this.$remove(function () {
+	      cleanup(self)
+	    })
+	  } else {
+	    cleanup(self)
+	  }
+	}
+
+	/**
+	 * Clean up to ensure garbage collection.
+	 * This is called after the leave transition if there
+	 * is any.
+	 *
+	 * @param {Vue} vm
+	 */
+
+	function cleanup (vm) {
 	  // remove reference from data ob
-	  this._data.__ob__.removeVm(this)
-	  this._data =
-	  this._watchers =
-	  this._userWatchers =
-	  this._watcherList =
-	  this.$el =
-	  this.$parent =
-	  this.$root =
-	  this._children =
-	  this._bindings =
-	  this._directives = null
+	  vm._data.__ob__.removeVm(vm)
+	  vm._data =
+	  vm._watchers =
+	  vm._userWatchers =
+	  vm._watcherList =
+	  vm.$el =
+	  vm.$parent =
+	  vm.$root =
+	  vm._children =
+	  vm._bindings =
+	  vm._directives = null
 	  // call the last hook...
-	  this._isDestroyed = true
-	  this._callHook('destroyed')
+	  vm._isDestroyed = true
+	  vm._callHook('destroyed')
 	  // turn off all instance listeners.
-	  this.$off()
+	  vm.$off() 
 	}
 
 	/**
@@ -1254,7 +1276,7 @@
 
 	// event listener directives
 	exports.on         = __webpack_require__(54)
-	exports.model      = __webpack_require__(68)
+	exports.model      = __webpack_require__(69)
 
 	// child vm directives
 	exports.component  = __webpack_require__(55)
@@ -1320,13 +1342,14 @@
 	  value = parseFloat(value)
 	  if (!value && value !== 0) return ''
 	  sign = sign || '$'
-	  var s = Math.floor(value).toString(),
+	  var s = Math.floor(Math.abs(value)).toString(),
 	    i = s.length % 3,
 	    h = i > 0
 	      ? (s.slice(0, i) + (s.length > 3 ? ',' : ''))
 	      : '',
 	    f = '.' + value.toFixed(2).slice(-2)
-	  return sign + h + s.slice(i).replace(digitsRE, '$1,') + f
+	  return (value < 0 ? '-' : '') +
+	    sign + h + s.slice(i).replace(digitsRE, '$1,') + f
 	}
 
 	/**
@@ -1385,13 +1408,13 @@
 	 * Install special array filters
 	 */
 
-	_.extend(exports, __webpack_require__(60))
+	_.extend(exports, __webpack_require__(59))
 
 /***/ },
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var mergeOptions = __webpack_require__(35)
+	var mergeOptions = __webpack_require__(40)
 
 	/**
 	 * The main init sequence. This is called for every
@@ -1600,8 +1623,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var Observer = __webpack_require__(69)
-	var Binding = __webpack_require__(59)
+	var Observer = __webpack_require__(70)
+	var Binding = __webpack_require__(60)
 
 	/**
 	 * Setup the scope of an instance, which contains:
@@ -1823,8 +1846,8 @@
 
 	var _ = __webpack_require__(12)
 	var Directive = __webpack_require__(61)
-	var compile = __webpack_require__(66)
-	var transclude = __webpack_require__(67)
+	var compile = __webpack_require__(67)
+	var transclude = __webpack_require__(68)
 
 	/**
 	 * Transclude, compile and link element.
@@ -1975,7 +1998,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var mixins = __webpack_require__(75);
+	var mixins = __webpack_require__(79);
 
 	module.exports = {
 	    name: 'Accordion',
@@ -1987,7 +2010,7 @@
 	        mixins.bindBehaviorsMixin
 	    ],
 
-	    template: __webpack_require__(85),
+	    template: __webpack_require__(89),
 
 	    beforeCompile: function () {
 	        $(this.$el).accordion();
@@ -2012,57 +2035,52 @@
 /* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * Module dependencies
-	 */
-
-	var mixins = __webpack_require__(75);
-
-
-	/**
-	 *  <ui-modal> definition
-	 */
+	var mixins = __webpack_require__(79);
 
 	module.exports = {
-	    name: 'Modal',
+	    name: 'Checkbox',
 
-	    paramAttributes: [ 'type', 'title', 'size' ],
+	    template: __webpack_require__(90),
+
+	    paramAttributes: ['type', 'name', 'checked', 'label', 'value'],
+
+	    compiled: function () {
+	        $(this.$$.checkbox).checkbox();
+	    },
+
+	    ready: function () {
+	        if(this.checked === 'checked') this.$check();
+	    },
 
 	    mixins: [
+	        mixins.appendToClassMixin,
 	        mixins.bindBehaviorsMixin
 	    ],
 
-	    compiled: function () {
-	        var vm = this;
-
-	        $(this.$$.modal).modal({
-	            onApprove: function () {
-	                vm.$emit('approved');
-	            },
-	            onDeny: function () {
-	                vm.$emit('denied');
-	            }
-	        });
-	    },
-
 	    data: function () {
 	        return {
-	            title: '',
-	            type: 'standard',
-	            size: ''
+	            type: 'checkbox',
+	            disabled: false
+	        };
+	    },
+
+	    watch: {
+	        disabled: function (isDisabled) {
+	            isDisabled ? this.$disable() : this.$enable();
 	        }
 	    },
 
 	    behaviors: [
-	        'hide',
 	        'toggle',
-	        'is active'
-	    ],
-
-	    template: __webpack_require__(83),
-
-	    replace: true
+	        'check',
+	        'uncheck',
+	        'enable',
+	        'disable',
+	        'is checked',
+	        'is radio'
+	    ]
 	};
+
 
 /***/ },
 /* 29 */
@@ -2073,7 +2091,7 @@
 	 * Module dependencies
 	 */
 
-	var mixins = __webpack_require__(75);
+	var mixins = __webpack_require__(79);
 
 
 	/**
@@ -2125,11 +2143,67 @@
 	        'hide'
 	    ],
 
-	    template: __webpack_require__(84)
+	    template: __webpack_require__(91)
 	};
 
 /***/ },
 /* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Module dependencies
+	 */
+
+	var mixins = __webpack_require__(79);
+
+
+	/**
+	 *  <ui-modal> definition
+	 */
+
+	module.exports = {
+	    name: 'Modal',
+
+	    paramAttributes: [ 'type', 'title', 'size' ],
+
+	    mixins: [
+	        mixins.bindBehaviorsMixin
+	    ],
+
+	    compiled: function () {
+	        var vm = this;
+
+	        $(this.$$.modal).modal({
+	            onApprove: function () {
+	                vm.$emit('approved');
+	            },
+	            onDeny: function () {
+	                vm.$emit('denied');
+	            }
+	        });
+	    },
+
+	    data: function () {
+	        return {
+	            title: '',
+	            type: 'standard',
+	            size: ''
+	        }
+	    },
+
+	    behaviors: [
+	        'hide',
+	        'toggle',
+	        'is active'
+	    ],
+
+	    template: __webpack_require__(92),
+
+	    replace: true
+	};
+
+/***/ },
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2177,13 +2251,13 @@
 	        };
 	    },
 
-	    template: __webpack_require__(86),
+	    template: __webpack_require__(93),
 
 	    replace: true
 	};
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2192,7 +2266,7 @@
 	 */
 
 	var Vue = __webpack_require__(2);
-	var appendToClassMixin = __webpack_require__(74);
+	var appendToClassMixin = __webpack_require__(78);
 
 
 	/**
@@ -2270,59 +2344,8 @@
 	        }
 	    },
 
-	    template: __webpack_require__(87)
+	    template: __webpack_require__(94)
 	};
-
-/***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var mixins = __webpack_require__(75);
-
-	module.exports = {
-	    name: 'Checkbox',
-
-	    template: __webpack_require__(88),
-
-	    paramAttributes: ['type', 'name', 'checked', 'label', 'value'],
-
-	    compiled: function () {
-	        $(this.$$.checkbox).checkbox();
-	    },
-
-	    ready: function () {
-	        if(this.checked === 'checked') this.$check();
-	    },
-
-	    mixins: [
-	        mixins.appendToClassMixin,
-	        mixins.bindBehaviorsMixin
-	    ],
-
-	    data: function () {
-	        return {
-	            type: 'checkbox',
-	            disabled: false
-	        };
-	    },
-
-	    watch: {
-	        disabled: function (isDisabled) {
-	            isDisabled ? this.$disable() : this.$enable();
-	        }
-	    },
-
-	    behaviors: [
-	        'toggle',
-	        'check',
-	        'uncheck',
-	        'enable',
-	        'disable',
-	        'is checked',
-	        'is radio'
-	    ]
-	};
-
 
 /***/ },
 /* 33 */
@@ -2333,7 +2356,7 @@
 	 * Module dependencies
 	 */
 
-	var appendToClassMixin = __webpack_require__(74);
+	var appendToClassMixin = __webpack_require__(78);
 
 
 	/**
@@ -2379,7 +2402,7 @@
 	        }
 	    },
 
-	    template: __webpack_require__(90)
+	    template: __webpack_require__(95)
 	};
 
 /***/ },
@@ -2391,7 +2414,7 @@
 	 * Module dependencies
 	 */
 
-	var mixins = __webpack_require__(75);
+	var mixins = __webpack_require__(79);
 
 
 	/**
@@ -2427,11 +2450,582 @@
 
 	    behaviors: [ 'show', 'hide', 'toggle' ],
 
-	    template: __webpack_require__(89)
+	    template: __webpack_require__(96)
 	};
 
 /***/ },
 /* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Check is a string starts with $ or _
+	 *
+	 * @param {String} str
+	 * @return {Boolean}
+	 */
+
+	exports.isReserved = function (str) {
+	  var c = str.charCodeAt(0)
+	  return c === 0x24 || c === 0x5F
+	}
+
+	/**
+	 * Guard text output, make sure undefined outputs
+	 * empty string
+	 *
+	 * @param {*} value
+	 * @return {String}
+	 */
+
+	exports.toString = function (value) {
+	  return value == null
+	    ? ''
+	    : value.toString()
+	}
+
+	/**
+	 * Check and convert possible numeric numbers before
+	 * setting back to data
+	 *
+	 * @param {*} value
+	 * @return {*|Number}
+	 */
+
+	exports.toNumber = function (value) {
+	  return (
+	    isNaN(value) ||
+	    value === null ||
+	    typeof value === 'boolean'
+	  ) ? value
+	    : Number(value)
+	}
+
+	/**
+	 * Strip quotes from a string
+	 *
+	 * @param {String} str
+	 * @return {String | false}
+	 */
+
+	exports.stripQuotes = function (str) {
+	  var a = str.charCodeAt(0)
+	  var b = str.charCodeAt(str.length - 1)
+	  return a === b && (a === 0x22 || a === 0x27)
+	    ? str.slice(1, -1)
+	    : false
+	}
+
+	/**
+	 * Camelize a hyphen-delmited string.
+	 *
+	 * @param {String} str
+	 * @return {String}
+	 */
+
+	var camelRE = /[-_](\w)/g
+	var capitalCamelRE = /(?:^|[-_])(\w)/g
+
+	exports.camelize = function (str, cap) {
+	  var RE = cap ? capitalCamelRE : camelRE
+	  return str.replace(RE, function (_, c) {
+	    return c ? c.toUpperCase () : '';
+	  })
+	}
+
+	/**
+	 * Simple bind, faster than native
+	 *
+	 * @param {Function} fn
+	 * @param {Object} ctx
+	 * @return {Function}
+	 */
+
+	exports.bind = function (fn, ctx) {
+	  return function () {
+	    return fn.apply(ctx, arguments)
+	  }
+	}
+
+	/**
+	 * Convert an Array-like object to a real Array.
+	 *
+	 * @param {Array-like} list
+	 * @param {Number} [start] - start index
+	 * @return {Array}
+	 */
+
+	exports.toArray = function (list, start) {
+	  start = start || 0
+	  var i = list.length - start
+	  var ret = new Array(i)
+	  while (i--) {
+	    ret[i] = list[i + start]
+	  }
+	  return ret
+	}
+
+	/**
+	 * Mix properties into target object.
+	 *
+	 * @param {Object} to
+	 * @param {Object} from
+	 */
+
+	exports.extend = function (to, from) {
+	  for (var key in from) {
+	    to[key] = from[key]
+	  }
+	}
+
+	/**
+	 * Quick object check - this is primarily used to tell
+	 * Objects from primitive values when we know the value
+	 * is a JSON-compliant type.
+	 *
+	 * @param {*} obj
+	 * @return {Boolean}
+	 */
+
+	exports.isObject = function (obj) {
+	  return obj && typeof obj === 'object'
+	}
+
+	/**
+	 * Strict object type check. Only returns true
+	 * for plain JavaScript objects.
+	 *
+	 * @param {*} obj
+	 * @return {Boolean}
+	 */
+
+	var toString = Object.prototype.toString
+	exports.isPlainObject = function (obj) {
+	  return toString.call(obj) === '[object Object]'
+	}
+
+	/**
+	 * Array type check.
+	 *
+	 * @param {*} obj
+	 * @return {Boolean}
+	 */
+
+	exports.isArray = function (obj) {
+	  return Array.isArray(obj)
+	}
+
+	/**
+	 * Define a non-enumerable property
+	 *
+	 * @param {Object} obj
+	 * @param {String} key
+	 * @param {*} val
+	 * @param {Boolean} [enumerable]
+	 */
+
+	exports.define = function (obj, key, val, enumerable) {
+	  Object.defineProperty(obj, key, {
+	    value        : val,
+	    enumerable   : !!enumerable,
+	    writable     : true,
+	    configurable : true
+	  })
+	}
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Can we use __proto__?
+	 *
+	 * @type {Boolean}
+	 */
+
+	exports.hasProto = '__proto__' in {}
+
+	/**
+	 * Indicates we have a window
+	 *
+	 * @type {Boolean}
+	 */
+
+	var toString = Object.prototype.toString
+	var inBrowser = exports.inBrowser =
+	  typeof window !== 'undefined' &&
+	  toString.call(window) !== '[object Object]'
+
+	/**
+	 * Defer a task to the start of the next event loop
+	 *
+	 * @param {Function} cb
+	 * @param {Object} ctx
+	 */
+
+	var defer = inBrowser
+	  ? (window.requestAnimationFrame ||
+	    window.webkitRequestAnimationFrame ||
+	    setTimeout)
+	  : setTimeout
+
+	exports.nextTick = function (cb, ctx) {
+	  if (ctx) {
+	    defer(function () { cb.call(ctx) }, 0)
+	  } else {
+	    defer(cb, 0)
+	  }
+	}
+
+	/**
+	 * Detect if we are in IE9...
+	 *
+	 * @type {Boolean}
+	 */
+
+	exports.isIE9 =
+	  inBrowser &&
+	  navigator.userAgent.indexOf('MSIE 9.0') > 0
+
+	/**
+	 * Sniff transition/animation events
+	 */
+
+	if (inBrowser && !exports.isIE9) {
+	  var isWebkitTrans =
+	    window.ontransitionend === undefined &&
+	    window.onwebkittransitionend !== undefined
+	  var isWebkitAnim =
+	    window.onanimationend === undefined &&
+	    window.onwebkitanimationend !== undefined
+	  exports.transitionProp = isWebkitTrans
+	    ? 'WebkitTransition'
+	    : 'transition'
+	  exports.transitionEndEvent = isWebkitTrans
+	    ? 'webkitTransitionEnd'
+	    : 'transitionend'
+	  exports.animationProp = isWebkitAnim
+	    ? 'WebkitAnimation'
+	    : 'animation'
+	  exports.animationEndEvent = isWebkitAnim
+	    ? 'webkitAnimationEnd'
+	    : 'animationend'
+	}
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var config = __webpack_require__(41)
+
+	/**
+	 * Check if a node is in the document.
+	 *
+	 * @param {Node} node
+	 * @return {Boolean}
+	 */
+
+	var doc =
+	  typeof document !== 'undefined' &&
+	  document.documentElement
+
+	exports.inDoc = function (node) {
+	  return doc && doc.contains(node)
+	}
+
+	/**
+	 * Extract an attribute from a node.
+	 *
+	 * @param {Node} node
+	 * @param {String} attr
+	 */
+
+	exports.attr = function (node, attr) {
+	  attr = config.prefix + attr
+	  var val = node.getAttribute(attr)
+	  if (val !== null) {
+	    node.removeAttribute(attr)
+	  }
+	  return val
+	}
+
+	/**
+	 * Insert el before target
+	 *
+	 * @param {Element} el
+	 * @param {Element} target 
+	 */
+
+	exports.before = function (el, target) {
+	  target.parentNode.insertBefore(el, target)
+	}
+
+	/**
+	 * Insert el after target
+	 *
+	 * @param {Element} el
+	 * @param {Element} target 
+	 */
+
+	exports.after = function (el, target) {
+	  if (target.nextSibling) {
+	    exports.before(el, target.nextSibling)
+	  } else {
+	    target.parentNode.appendChild(el)
+	  }
+	}
+
+	/**
+	 * Remove el from DOM
+	 *
+	 * @param {Element} el
+	 */
+
+	exports.remove = function (el) {
+	  el.parentNode.removeChild(el)
+	}
+
+	/**
+	 * Prepend el to target
+	 *
+	 * @param {Element} el
+	 * @param {Element} target 
+	 */
+
+	exports.prepend = function (el, target) {
+	  if (target.firstChild) {
+	    exports.before(el, target.firstChild)
+	  } else {
+	    target.appendChild(el)
+	  }
+	}
+
+	/**
+	 * Replace target with el
+	 *
+	 * @param {Element} target
+	 * @param {Element} el
+	 */
+
+	exports.replace = function (target, el) {
+	  var parent = target.parentNode
+	  if (parent) {
+	    parent.replaceChild(el, target)
+	  }
+	}
+
+	/**
+	 * Copy attributes from one element to another.
+	 *
+	 * @param {Element} from
+	 * @param {Element} to
+	 */
+
+	exports.copyAttributes = function (from, to) {
+	  if (from.hasAttributes()) {
+	    var attrs = from.attributes
+	    for (var i = 0, l = attrs.length; i < l; i++) {
+	      var attr = attrs[i]
+	      to.setAttribute(attr.name, attr.value)
+	    }
+	  }
+	}
+
+	/**
+	 * Add event listener shorthand.
+	 *
+	 * @param {Element} el
+	 * @param {String} event
+	 * @param {Function} cb
+	 */
+
+	exports.on = function (el, event, cb) {
+	  el.addEventListener(event, cb)
+	}
+
+	/**
+	 * Remove event listener shorthand.
+	 *
+	 * @param {Element} el
+	 * @param {String} event
+	 * @param {Function} cb
+	 */
+
+	exports.off = function (el, event, cb) {
+	  el.removeEventListener(event, cb)
+	}
+
+	/**
+	 * Add class with compatibility for IE & SVG
+	 *
+	 * @param {Element} el
+	 * @param {Strong} cls
+	 */
+
+	exports.addClass = function (el, cls) {
+	  if (el.classList) {
+	    el.classList.add(cls)
+	  } else {
+	    var cur = ' ' + (el.getAttribute('class') || '') + ' '
+	    if (cur.indexOf(' ' + cls + ' ') < 0) {
+	      el.setAttribute('class', (cur + cls).trim())
+	    }
+	  }
+	}
+
+	/**
+	 * Remove class with compatibility for IE & SVG
+	 *
+	 * @param {Element} el
+	 * @param {Strong} cls
+	 */
+
+	exports.removeClass = function (el, cls) {
+	  if (el.classList) {
+	    el.classList.remove(cls)
+	  } else {
+	    var cur = ' ' + (el.getAttribute('class') || '') + ' '
+	    var tar = ' ' + cls + ' '
+	    while (cur.indexOf(tar) >= 0) {
+	      cur = cur.replace(tar, ' ')
+	    }
+	    el.setAttribute('class', cur.trim())
+	  }
+	}
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _ = __webpack_require__(39)
+
+	/**
+	 * Resolve read & write filters for a vm instance. The
+	 * filters descriptor Array comes from the directive parser.
+	 *
+	 * This is extracted into its own utility so it can
+	 * be used in multiple scenarios.
+	 *
+	 * @param {Vue} vm
+	 * @param {Array<Object>} filters
+	 * @param {Object} [target]
+	 * @return {Object}
+	 */
+
+	exports.resolveFilters = function (vm, filters, target) {
+	  if (!filters) {
+	    return
+	  }
+	  var res = target || {}
+	  // var registry = vm.$options.filters
+	  filters.forEach(function (f) {
+	    var def = vm.$options.filters[f.name]
+	    _.assertAsset(def, 'filter', f.name)
+	    if (!def) return
+	    var args = f.args
+	    var reader, writer
+	    if (typeof def === 'function') {
+	      reader = def
+	    } else {
+	      reader = def.read
+	      writer = def.write
+	    }
+	    if (reader) {
+	      if (!res.read) res.read = []
+	      res.read.push(function (value) {
+	        return args
+	          ? reader.apply(vm, [value].concat(args))
+	          : reader.call(vm, value)
+	      })
+	    }
+	    if (writer) {
+	      if (!res.write) res.write = []
+	      res.write.push(function (value, oldVal) {
+	        return args
+	          ? writer.apply(vm, [value, oldVal].concat(args))
+	          : writer.call(vm, value, oldVal)
+	      })
+	    }
+	  })
+	  return res
+	}
+
+	/**
+	 * Apply filters to a value
+	 *
+	 * @param {*} value
+	 * @param {Array} filters
+	 * @param {Vue} vm
+	 * @param {*} oldVal
+	 * @return {*}
+	 */
+
+	exports.applyFilters = function (value, filters, vm, oldVal) {
+	  if (!filters) {
+	    return value
+	  }
+	  for (var i = 0, l = filters.length; i < l; i++) {
+	    value = filters[i].call(vm, value, oldVal)
+	  }
+	  return value
+	}
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var config = __webpack_require__(41)
+
+	/**
+	 * Enable debug utilities. The enableDebug() function and
+	 * all _.log() & _.warn() calls will be dropped in the
+	 * minified production build.
+	 */
+
+	enableDebug()
+
+	function enableDebug () {
+	  var hasConsole = typeof console !== 'undefined'
+	  
+	  /**
+	   * Log a message.
+	   *
+	   * @param {String} msg
+	   */
+
+	  exports.log = function (msg) {
+	    if (hasConsole && config.debug) {
+	      console.log('[Vue info]: ' + msg)
+	    }
+	  }
+
+	  /**
+	   * We've got a problem here.
+	   *
+	   * @param {String} msg
+	   */
+
+	  exports.warn = function (msg) {
+	    if (hasConsole && !config.silent) {
+	      console.warn('[Vue warn]: ' + msg)
+	      if (config.debug && console.trace) {
+	        console.trace()
+	      }
+	    }
+	  }
+
+	  /**
+	   * Assert asset exists
+	   */
+
+	  exports.assertAsset = function (val, type, id) {
+	    if (!val) {
+	      exports.warn('Failed to resolve ' + type + ': ' + id)
+	    }
+	  }
+	}
+
+/***/ },
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -2665,7 +3259,7 @@
 	}
 
 /***/ },
-/* 36 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = {
@@ -2749,14 +3343,14 @@
 	})
 
 /***/ },
-/* 37 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var config = __webpack_require__(36)
-	var Observer = __webpack_require__(69)
-	var expParser = __webpack_require__(64)
-	var Batcher = __webpack_require__(77)
+	var config = __webpack_require__(41)
+	var Observer = __webpack_require__(70)
+	var expParser = __webpack_require__(65)
+	var Batcher = __webpack_require__(75)
 
 	var batcher = new Batcher()
 	var uid = 0
@@ -2969,569 +3563,6 @@
 	module.exports = Watcher
 
 /***/ },
-/* 38 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Check is a string starts with $ or _
-	 *
-	 * @param {String} str
-	 * @return {Boolean}
-	 */
-
-	exports.isReserved = function (str) {
-	  var c = str.charCodeAt(0)
-	  return c === 0x24 || c === 0x5F
-	}
-
-	/**
-	 * Guard text output, make sure undefined outputs
-	 * empty string
-	 *
-	 * @param {*} value
-	 * @return {String}
-	 */
-
-	exports.toString = function (value) {
-	  return value == null
-	    ? ''
-	    : value.toString()
-	}
-
-	/**
-	 * Check and convert possible numeric numbers before
-	 * setting back to data
-	 *
-	 * @param {*} value
-	 * @return {*|Number}
-	 */
-
-	exports.toNumber = function (value) {
-	  return (
-	    isNaN(value) ||
-	    value === null ||
-	    typeof value === 'boolean'
-	  ) ? value
-	    : Number(value)
-	}
-
-	/**
-	 * Strip quotes from a string
-	 *
-	 * @param {String} str
-	 * @return {String | false}
-	 */
-
-	exports.stripQuotes = function (str) {
-	  var a = str.charCodeAt(0)
-	  var b = str.charCodeAt(str.length - 1)
-	  return a === b && (a === 0x22 || a === 0x27)
-	    ? str.slice(1, -1)
-	    : false
-	}
-
-	/**
-	 * Camelize a hyphen-delmited string.
-	 *
-	 * @param {String} str
-	 * @return {String}
-	 */
-
-	var camelRE = /[-_](\w)/g
-	var capitalCamelRE = /(?:^|[-_])(\w)/g
-
-	exports.camelize = function (str, cap) {
-	  var RE = cap ? capitalCamelRE : camelRE
-	  return str.replace(RE, function (_, c) {
-	    return c ? c.toUpperCase () : '';
-	  })
-	}
-
-	/**
-	 * Simple bind, faster than native
-	 *
-	 * @param {Function} fn
-	 * @param {Object} ctx
-	 * @return {Function}
-	 */
-
-	exports.bind = function (fn, ctx) {
-	  return function () {
-	    return fn.apply(ctx, arguments)
-	  }
-	}
-
-	/**
-	 * Convert an Array-like object to a real Array.
-	 *
-	 * @param {Array-like} list
-	 * @param {Number} [start] - start index
-	 * @return {Array}
-	 */
-
-	exports.toArray = function (list, start) {
-	  start = start || 0
-	  var i = list.length - start
-	  var ret = new Array(i)
-	  while (i--) {
-	    ret[i] = list[i + start]
-	  }
-	  return ret
-	}
-
-	/**
-	 * Mix properties into target object.
-	 *
-	 * @param {Object} to
-	 * @param {Object} from
-	 */
-
-	exports.extend = function (to, from) {
-	  for (var key in from) {
-	    to[key] = from[key]
-	  }
-	}
-
-	/**
-	 * Quick object check - this is primarily used to tell
-	 * Objects from primitive values when we know the value
-	 * is a JSON-compliant type.
-	 *
-	 * @param {*} obj
-	 * @return {Boolean}
-	 */
-
-	exports.isObject = function (obj) {
-	  return obj && typeof obj === 'object'
-	}
-
-	/**
-	 * Strict object type check. Only returns true
-	 * for plain JavaScript objects.
-	 *
-	 * @param {*} obj
-	 * @return {Boolean}
-	 */
-
-	var toString = Object.prototype.toString
-	exports.isPlainObject = function (obj) {
-	  return toString.call(obj) === '[object Object]'
-	}
-
-	/**
-	 * Array type check.
-	 *
-	 * @param {*} obj
-	 * @return {Boolean}
-	 */
-
-	exports.isArray = function (obj) {
-	  return Array.isArray(obj)
-	}
-
-	/**
-	 * Define a non-enumerable property
-	 *
-	 * @param {Object} obj
-	 * @param {String} key
-	 * @param {*} val
-	 * @param {Boolean} [enumerable]
-	 */
-
-	exports.define = function (obj, key, val, enumerable) {
-	  Object.defineProperty(obj, key, {
-	    value        : val,
-	    enumerable   : !!enumerable,
-	    writable     : true,
-	    configurable : true
-	  })
-	}
-
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Can we use __proto__?
-	 *
-	 * @type {Boolean}
-	 */
-
-	exports.hasProto = '__proto__' in {}
-
-	/**
-	 * Indicates we have a window
-	 *
-	 * @type {Boolean}
-	 */
-
-	var toString = Object.prototype.toString
-	var inBrowser = exports.inBrowser =
-	  typeof window !== 'undefined' &&
-	  toString.call(window) !== '[object Object]'
-
-	/**
-	 * Defer a task to the start of the next event loop
-	 *
-	 * @param {Function} cb
-	 * @param {Object} ctx
-	 */
-
-	var defer = inBrowser
-	  ? (window.requestAnimationFrame ||
-	    window.webkitRequestAnimationFrame ||
-	    setTimeout)
-	  : setTimeout
-
-	exports.nextTick = function (cb, ctx) {
-	  if (ctx) {
-	    defer(function () { cb.call(ctx) }, 0)
-	  } else {
-	    defer(cb, 0)
-	  }
-	}
-
-	/**
-	 * Detect if we are in IE9...
-	 *
-	 * @type {Boolean}
-	 */
-
-	exports.isIE9 =
-	  inBrowser &&
-	  navigator.userAgent.indexOf('MSIE 9.0') > 0
-
-	/**
-	 * Sniff transition/animation events
-	 */
-
-	if (inBrowser && !exports.isIE9) {
-	  var isWebkitTrans =
-	    window.ontransitionend === undefined &&
-	    window.onwebkittransitionend !== undefined
-	  var isWebkitAnim =
-	    window.onanimationend === undefined &&
-	    window.onwebkitanimationend !== undefined
-	  exports.transitionProp = isWebkitTrans
-	    ? 'WebkitTransition'
-	    : 'transition'
-	  exports.transitionEndEvent = isWebkitTrans
-	    ? 'webkitTransitionEnd'
-	    : 'transitionend'
-	  exports.animationProp = isWebkitAnim
-	    ? 'WebkitAnimation'
-	    : 'animation'
-	  exports.animationEndEvent = isWebkitAnim
-	    ? 'webkitAnimationEnd'
-	    : 'animationend'
-	}
-
-/***/ },
-/* 40 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var config = __webpack_require__(36)
-
-	/**
-	 * Check if a node is in the document.
-	 *
-	 * @param {Node} node
-	 * @return {Boolean}
-	 */
-
-	var doc =
-	  typeof document !== 'undefined' &&
-	  document.documentElement
-
-	exports.inDoc = function (node) {
-	  return doc && doc.contains(node)
-	}
-
-	/**
-	 * Extract an attribute from a node.
-	 *
-	 * @param {Node} node
-	 * @param {String} attr
-	 */
-
-	exports.attr = function (node, attr) {
-	  attr = config.prefix + attr
-	  var val = node.getAttribute(attr)
-	  if (val !== null) {
-	    node.removeAttribute(attr)
-	  }
-	  return val
-	}
-
-	/**
-	 * Insert el before target
-	 *
-	 * @param {Element} el
-	 * @param {Element} target 
-	 */
-
-	exports.before = function (el, target) {
-	  target.parentNode.insertBefore(el, target)
-	}
-
-	/**
-	 * Insert el after target
-	 *
-	 * @param {Element} el
-	 * @param {Element} target 
-	 */
-
-	exports.after = function (el, target) {
-	  if (target.nextSibling) {
-	    exports.before(el, target.nextSibling)
-	  } else {
-	    target.parentNode.appendChild(el)
-	  }
-	}
-
-	/**
-	 * Remove el from DOM
-	 *
-	 * @param {Element} el
-	 */
-
-	exports.remove = function (el) {
-	  el.parentNode.removeChild(el)
-	}
-
-	/**
-	 * Prepend el to target
-	 *
-	 * @param {Element} el
-	 * @param {Element} target 
-	 */
-
-	exports.prepend = function (el, target) {
-	  if (target.firstChild) {
-	    exports.before(el, target.firstChild)
-	  } else {
-	    target.appendChild(el)
-	  }
-	}
-
-	/**
-	 * Replace target with el
-	 *
-	 * @param {Element} target
-	 * @param {Element} el
-	 */
-
-	exports.replace = function (target, el) {
-	  var parent = target.parentNode
-	  if (parent) {
-	    parent.replaceChild(el, target)
-	  }
-	}
-
-	/**
-	 * Copy attributes from one element to another.
-	 *
-	 * @param {Element} from
-	 * @param {Element} to
-	 */
-
-	exports.copyAttributes = function (from, to) {
-	  if (from.hasAttributes()) {
-	    var attrs = from.attributes
-	    for (var i = 0, l = attrs.length; i < l; i++) {
-	      var attr = attrs[i]
-	      to.setAttribute(attr.name, attr.value)
-	    }
-	  }
-	}
-
-	/**
-	 * Add event listener shorthand.
-	 *
-	 * @param {Element} el
-	 * @param {String} event
-	 * @param {Function} cb
-	 */
-
-	exports.on = function (el, event, cb) {
-	  el.addEventListener(event, cb)
-	}
-
-	/**
-	 * Remove event listener shorthand.
-	 *
-	 * @param {Element} el
-	 * @param {String} event
-	 * @param {Function} cb
-	 */
-
-	exports.off = function (el, event, cb) {
-	  el.removeEventListener(event, cb)
-	}
-
-	/**
-	 * Compatibility add class for IE9
-	 *
-	 * @param {Element} el
-	 * @param {Strong} cls
-	 */
-
-	exports.addClass = function (el, cls) {
-	  var cur = ' ' + el.className + ' '
-	  if (cur.indexOf(' ' + cls + ' ') < 0) {
-	    el.className = (cur + cls).trim()
-	  }
-	}
-
-	/**
-	 * Compatibility remove class for IE9
-	 *
-	 * @param {Element} el
-	 * @param {Strong} cls
-	 */
-
-	exports.removeClass = function (el, cls) {
-	  var cur = ' ' + el.className + ' '
-	  var tar = ' ' + cls + ' '
-	  while (cur.indexOf(tar) >= 0) {
-	    cur = cur.replace(tar, ' ')
-	  }
-	  el.className = cur.trim()
-	}
-
-/***/ },
-/* 41 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var _ = __webpack_require__(42)
-
-	/**
-	 * Resolve read & write filters for a vm instance. The
-	 * filters descriptor Array comes from the directive parser.
-	 *
-	 * This is extracted into its own utility so it can
-	 * be used in multiple scenarios.
-	 *
-	 * @param {Vue} vm
-	 * @param {Array<Object>} filters
-	 * @param {Object} [target]
-	 * @return {Object}
-	 */
-
-	exports.resolveFilters = function (vm, filters, target) {
-	  if (!filters) {
-	    return
-	  }
-	  var res = target || {}
-	  // var registry = vm.$options.filters
-	  filters.forEach(function (f) {
-	    var def = vm.$options.filters[f.name]
-	    _.assertAsset(def, 'filter', f.name)
-	    if (!def) return
-	    var args = f.args
-	    var reader, writer
-	    if (typeof def === 'function') {
-	      reader = def
-	    } else {
-	      reader = def.read
-	      writer = def.write
-	    }
-	    if (reader) {
-	      if (!res.read) res.read = []
-	      res.read.push(function (value) {
-	        return args
-	          ? reader.apply(vm, [value].concat(args))
-	          : reader.call(vm, value)
-	      })
-	    }
-	    if (writer) {
-	      if (!res.write) res.write = []
-	      res.write.push(function (value, oldVal) {
-	        return args
-	          ? writer.apply(vm, [value, oldVal].concat(args))
-	          : writer.call(vm, value, oldVal)
-	      })
-	    }
-	  })
-	  return res
-	}
-
-	/**
-	 * Apply filters to a value
-	 *
-	 * @param {*} value
-	 * @param {Array} filters
-	 * @param {Vue} vm
-	 * @param {*} oldVal
-	 * @return {*}
-	 */
-
-	exports.applyFilters = function (value, filters, vm, oldVal) {
-	  if (!filters) {
-	    return value
-	  }
-	  for (var i = 0, l = filters.length; i < l; i++) {
-	    value = filters[i].call(vm, value, oldVal)
-	  }
-	  return value
-	}
-
-/***/ },
-/* 42 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var config = __webpack_require__(36)
-
-	/**
-	 * Enable debug utilities. The enableDebug() function and
-	 * all _.log() & _.warn() calls will be dropped in the
-	 * minified production build.
-	 */
-
-	enableDebug()
-
-	function enableDebug () {
-	  var hasConsole = typeof console !== 'undefined'
-	  
-	  /**
-	   * Log a message.
-	   *
-	   * @param {String} msg
-	   */
-
-	  exports.log = function (msg) {
-	    if (hasConsole && config.debug) {
-	      console.log('[Vue info]: ' + msg)
-	    }
-	  }
-
-	  /**
-	   * We've got a problem here.
-	   *
-	   * @param {String} msg
-	   */
-
-	  exports.warn = function (msg) {
-	    if (hasConsole && !config.silent) {
-	      console.warn('[Vue warn]: ' + msg)
-	      if (config.debug && console.trace) {
-	        console.trace()
-	      }
-	    }
-	  }
-
-	  /**
-	   * Assert asset exists
-	   */
-
-	  exports.assertAsset = function (val, type, id) {
-	    if (!val) {
-	      exports.warn('Failed to resolve ' + type + ': ' + id)
-	    }
-	  }
-	}
-
-/***/ },
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3556,7 +3587,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var templateParser = __webpack_require__(78)
+	var templateParser = __webpack_require__(76)
 
 	module.exports = {
 
@@ -3634,7 +3665,7 @@
 /* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var transition = __webpack_require__(65)
+	var transition = __webpack_require__(66)
 
 	module.exports = function (value) {
 	  var el = this.el
@@ -3648,35 +3679,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var hasClassList =
-	  typeof document !== 'undefined' &&
-	  'classList' in document.documentElement
-
-	/**
-	 * add class for IE9
-	 *
-	 * @param {Element} el
-	 * @param {Strong} cls
-	 */
-
-	var addClass = hasClassList
-	  ? function (el, cls) {
-	      el.classList.add(cls)
-	    }
-	  : _.addClass
-
-	/**
-	 * remove class for IE9
-	 *
-	 * @param {Element} el
-	 * @param {Strong} cls
-	 */
-
-	var removeClass = hasClassList
-	  ? function (el, cls) {
-	      el.classList.remove(cls)
-	    }
-	  : _.removeClass
+	var addClass = _.addClass
+	var removeClass = _.removeClass
 
 	module.exports = function (value) {
 	  if (this.arg) {
@@ -3733,7 +3737,9 @@
 	  },
 
 	  unbind: function () {
-	    delete this.owner.$[this.expression]
+	    if (this.owner.$[this.expression] === this.vm) {
+	      delete this.owner.$[this.expression]
+	    }
 	  }
 	  
 	}
@@ -3742,7 +3748,7 @@
 /* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var config = __webpack_require__(36)
+	var config = __webpack_require__(41)
 
 	module.exports = {
 
@@ -3811,8 +3817,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var templateParser = __webpack_require__(78)
-	var transition = __webpack_require__(65)
+	var templateParser = __webpack_require__(76)
+	var transition = __webpack_require__(66)
 
 	module.exports = {
 
@@ -3952,7 +3958,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var templateParser = __webpack_require__(78)
+	var templateParser = __webpack_require__(76)
 
 	module.exports = {
 
@@ -4070,20 +4076,13 @@
 	        child.$remove()
 	      }
 	    } else {
+	      child.$destroy(remove)
 	      var parentDirs = this.parentDirs
-	      var destroy = function () {
-	        child.$destroy()
-	        if (parentDirs) {
-	          var i = parentDirs.length
-	          while (i--) {
-	            parentDirs[i]._teardown()
-	          }
+	      if (parentDirs) {
+	        var i = parentDirs.length
+	        while (i--) {
+	          parentDirs[i]._teardown()
 	        }
-	      }
-	      if (remove) {
-	        child.$remove(destroy)
-	      } else {
-	        destroy()
 	      }
 	    }
 	    this.childVM = null
@@ -4121,12 +4120,12 @@
 
 	var _ = __webpack_require__(12)
 	var isObject = _.isObject
-	var textParser = __webpack_require__(62)
-	var expParser = __webpack_require__(64)
-	var templateParser = __webpack_require__(78)
-	var compile = __webpack_require__(66)
-	var transclude = __webpack_require__(67)
-	var mergeOptions = __webpack_require__(35)
+	var textParser = __webpack_require__(63)
+	var expParser = __webpack_require__(65)
+	var templateParser = __webpack_require__(76)
+	var compile = __webpack_require__(67)
+	var transclude = __webpack_require__(68)
+	var mergeOptions = __webpack_require__(40)
 	var uid = 0
 
 	module.exports = {
@@ -4632,9 +4631,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var compile = __webpack_require__(66)
-	var templateParser = __webpack_require__(78)
-	var transition = __webpack_require__(65)
+	var compile = __webpack_require__(67)
+	var templateParser = __webpack_require__(76)
+	var transition = __webpack_require__(66)
 
 	module.exports = {
 
@@ -4676,6 +4675,11 @@
 	  },
 
 	  insert: function () {
+	    // avoid duplicate inserts, since update() can be
+	    // called with different truthy values
+	    if (this.decompile) {
+	      return
+	    }
 	    var vm = this.vm
 	    var frag = templateParser.clone(this.template)
 	    var decompile = this.linker(vm, frag)
@@ -4700,7 +4704,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var Watcher = __webpack_require__(37)
+	var Watcher = __webpack_require__(42)
 
 	module.exports = {
 
@@ -4751,63 +4755,8 @@
 /* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var uid = 0
-
-	/**
-	 * A binding is an observable that can have multiple
-	 * directives subscribing to it.
-	 *
-	 * @constructor
-	 */
-
-	function Binding () {
-	  this.id = ++uid
-	  this.subs = []
-	}
-
-	var p = Binding.prototype
-
-	/**
-	 * Add a directive subscriber.
-	 *
-	 * @param {Directive} sub
-	 */
-
-	p.addSub = function (sub) {
-	  this.subs.push(sub)
-	}
-
-	/**
-	 * Remove a directive subscriber.
-	 *
-	 * @param {Directive} sub
-	 */
-
-	p.removeSub = function (sub) {
-	  if (this.subs.length) {
-	    var i = this.subs.indexOf(sub)
-	    if (i > -1) this.subs.splice(i, 1)
-	  }
-	}
-
-	/**
-	 * Notify all subscribers of a new value.
-	 */
-
-	p.notify = function () {
-	  for (var i = 0, l = this.subs.length; i < l; i++) {
-	    this.subs[i].update()
-	  }
-	}
-
-	module.exports = Binding
-
-/***/ },
-/* 60 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var _ = __webpack_require__(12)
-	var Path = __webpack_require__(79)
+	var Path = __webpack_require__(62)
 
 	/**
 	 * Filter filter for v-repeat
@@ -4895,14 +4844,69 @@
 	}
 
 /***/ },
+/* 60 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var uid = 0
+
+	/**
+	 * A binding is an observable that can have multiple
+	 * directives subscribing to it.
+	 *
+	 * @constructor
+	 */
+
+	function Binding () {
+	  this.id = ++uid
+	  this.subs = []
+	}
+
+	var p = Binding.prototype
+
+	/**
+	 * Add a directive subscriber.
+	 *
+	 * @param {Directive} sub
+	 */
+
+	p.addSub = function (sub) {
+	  this.subs.push(sub)
+	}
+
+	/**
+	 * Remove a directive subscriber.
+	 *
+	 * @param {Directive} sub
+	 */
+
+	p.removeSub = function (sub) {
+	  if (this.subs.length) {
+	    var i = this.subs.indexOf(sub)
+	    if (i > -1) this.subs.splice(i, 1)
+	  }
+	}
+
+	/**
+	 * Notify all subscribers of a new value.
+	 */
+
+	p.notify = function () {
+	  for (var i = 0, l = this.subs.length; i < l; i++) {
+	    this.subs[i].update()
+	  }
+	}
+
+	module.exports = Binding
+
+/***/ },
 /* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var config = __webpack_require__(36)
-	var Watcher = __webpack_require__(37)
-	var textParser = __webpack_require__(62)
-	var expParser = __webpack_require__(64)
+	var config = __webpack_require__(41)
+	var Watcher = __webpack_require__(42)
+	var textParser = __webpack_require__(63)
+	var expParser = __webpack_require__(65)
 
 	/**
 	 * A directive links a DOM element with a piece of data,
@@ -5105,9 +5109,314 @@
 /* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var _ = __webpack_require__(12)
 	var Cache = __webpack_require__(80)
-	var config = __webpack_require__(36)
-	var dirParser = __webpack_require__(63)
+	var pathCache = new Cache(1000)
+	var identRE = /^[$_a-zA-Z]+[\w$]*$/
+
+	/**
+	 * Path-parsing algorithm scooped from Polymer/observe-js
+	 */
+
+	var pathStateMachine = {
+	  'beforePath': {
+	    'ws': ['beforePath'],
+	    'ident': ['inIdent', 'append'],
+	    '[': ['beforeElement'],
+	    'eof': ['afterPath']
+	  },
+
+	  'inPath': {
+	    'ws': ['inPath'],
+	    '.': ['beforeIdent'],
+	    '[': ['beforeElement'],
+	    'eof': ['afterPath']
+	  },
+
+	  'beforeIdent': {
+	    'ws': ['beforeIdent'],
+	    'ident': ['inIdent', 'append']
+	  },
+
+	  'inIdent': {
+	    'ident': ['inIdent', 'append'],
+	    '0': ['inIdent', 'append'],
+	    'number': ['inIdent', 'append'],
+	    'ws': ['inPath', 'push'],
+	    '.': ['beforeIdent', 'push'],
+	    '[': ['beforeElement', 'push'],
+	    'eof': ['afterPath', 'push']
+	  },
+
+	  'beforeElement': {
+	    'ws': ['beforeElement'],
+	    '0': ['afterZero', 'append'],
+	    'number': ['inIndex', 'append'],
+	    "'": ['inSingleQuote', 'append', ''],
+	    '"': ['inDoubleQuote', 'append', '']
+	  },
+
+	  'afterZero': {
+	    'ws': ['afterElement', 'push'],
+	    ']': ['inPath', 'push']
+	  },
+
+	  'inIndex': {
+	    '0': ['inIndex', 'append'],
+	    'number': ['inIndex', 'append'],
+	    'ws': ['afterElement'],
+	    ']': ['inPath', 'push']
+	  },
+
+	  'inSingleQuote': {
+	    "'": ['afterElement'],
+	    'eof': 'error',
+	    'else': ['inSingleQuote', 'append']
+	  },
+
+	  'inDoubleQuote': {
+	    '"': ['afterElement'],
+	    'eof': 'error',
+	    'else': ['inDoubleQuote', 'append']
+	  },
+
+	  'afterElement': {
+	    'ws': ['afterElement'],
+	    ']': ['inPath', 'push']
+	  }
+	}
+
+	function noop () {}
+
+	/**
+	 * Determine the type of a character in a keypath.
+	 *
+	 * @param {Char} char
+	 * @return {String} type
+	 */
+
+	function getPathCharType (char) {
+	  if (char === undefined) {
+	    return 'eof'
+	  }
+
+	  var code = char.charCodeAt(0)
+
+	  switch(code) {
+	    case 0x5B: // [
+	    case 0x5D: // ]
+	    case 0x2E: // .
+	    case 0x22: // "
+	    case 0x27: // '
+	    case 0x30: // 0
+	      return char
+
+	    case 0x5F: // _
+	    case 0x24: // $
+	      return 'ident'
+
+	    case 0x20: // Space
+	    case 0x09: // Tab
+	    case 0x0A: // Newline
+	    case 0x0D: // Return
+	    case 0xA0:  // No-break space
+	    case 0xFEFF:  // Byte Order Mark
+	    case 0x2028:  // Line Separator
+	    case 0x2029:  // Paragraph Separator
+	      return 'ws'
+	  }
+
+	  // a-z, A-Z
+	  if ((0x61 <= code && code <= 0x7A) ||
+	      (0x41 <= code && code <= 0x5A)) {
+	    return 'ident'
+	  }
+
+	  // 1-9
+	  if (0x31 <= code && code <= 0x39) {
+	    return 'number'
+	  }
+
+	  return 'else'
+	}
+
+	/**
+	 * Parse a string path into an array of segments
+	 * Todo implement cache
+	 *
+	 * @param {String} path
+	 * @return {Array|undefined}
+	 */
+
+	function parsePath (path) {
+	  var keys = []
+	  var index = -1
+	  var mode = 'beforePath'
+	  var c, newChar, key, type, transition, action, typeMap
+
+	  var actions = {
+	    push: function() {
+	      if (key === undefined) {
+	        return
+	      }
+	      keys.push(key)
+	      key = undefined
+	    },
+	    append: function() {
+	      if (key === undefined) {
+	        key = newChar
+	      } else {
+	        key += newChar
+	      }
+	    }
+	  }
+
+	  function maybeUnescapeQuote () {
+	    var nextChar = path[index + 1]
+	    if ((mode === 'inSingleQuote' && nextChar === "'") ||
+	        (mode === 'inDoubleQuote' && nextChar === '"')) {
+	      index++
+	      newChar = nextChar
+	      actions.append()
+	      return true
+	    }
+	  }
+
+	  while (mode) {
+	    index++
+	    c = path[index]
+
+	    if (c === '\\' && maybeUnescapeQuote()) {
+	      continue
+	    }
+
+	    type = getPathCharType(c)
+	    typeMap = pathStateMachine[mode]
+	    transition = typeMap[type] || typeMap['else'] || 'error'
+
+	    if (transition === 'error') {
+	      return // parse error
+	    }
+
+	    mode = transition[0]
+	    action = actions[transition[1]] || noop
+	    newChar = transition[2] === undefined
+	      ? c
+	      : transition[2]
+	    action()
+
+	    if (mode === 'afterPath') {
+	      return keys
+	    }
+	  }
+	}
+
+	/**
+	 * Format a accessor segment based on its type.
+	 *
+	 * @param {String} key
+	 * @return {Boolean}
+	 */
+
+	function formatAccessor(key) {
+	  if (identRE.test(key)) { // identifier
+	    return '.' + key
+	  } else if (+key === key >>> 0) { // bracket index
+	    return '[' + key + ']';
+	  } else { // bracket string
+	    return '["' + key.replace(/"/g, '\\"') + '"]';
+	  }
+	}
+
+	/**
+	 * Compiles a getter function with a fixed path.
+	 *
+	 * @param {Array} path
+	 * @return {Function}
+	 */
+
+	exports.compileGetter = function (path) {
+	  var body =
+	    'try{return o' +
+	    path.map(formatAccessor).join('') +
+	    '}catch(e){};'
+	  return new Function('o', body)
+	}
+
+	/**
+	 * External parse that check for a cache hit first
+	 *
+	 * @param {String} path
+	 * @return {Array|undefined}
+	 */
+
+	exports.parse = function (path) {
+	  var hit = pathCache.get(path)
+	  if (!hit) {
+	    hit = parsePath(path)
+	    if (hit) {
+	      hit.get = exports.compileGetter(hit)
+	      pathCache.put(path, hit)
+	    }
+	  }
+	  return hit
+	}
+
+	/**
+	 * Get from an object from a path string
+	 *
+	 * @param {Object} obj
+	 * @param {String} path
+	 */
+
+	exports.get = function (obj, path) {
+	  path = exports.parse(path)
+	  if (path) {
+	    return path.get(obj)
+	  }
+	}
+
+	/**
+	 * Set on an object from a path
+	 *
+	 * @param {Object} obj
+	 * @param {String | Array} path
+	 * @param {*} val
+	 */
+
+	exports.set = function (obj, path, val) {
+	  if (typeof path === 'string') {
+	    path = exports.parse(path)
+	  }
+	  if (!path || !_.isObject(obj)) {
+	    return false
+	  }
+	  var last, key
+	  for (var i = 0, l = path.length - 1; i < l; i++) {
+	    last = obj
+	    key = path[i]
+	    obj = obj[key]
+	    if (!_.isObject(obj)) {
+	      obj = {}
+	      last.$add(key, obj)
+	    }
+	  }
+	  key = path[i]
+	  if (key in obj) {
+	    obj[key] = val
+	  } else {
+	    obj.$add(key, val)
+	  }
+	  return true
+	}
+
+/***/ },
+/* 63 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Cache = __webpack_require__(80)
+	var config = __webpack_require__(41)
+	var dirParser = __webpack_require__(64)
 	var regexEscapeRE = /[-.*+?^${}()|[\]\/\\]/g
 	var cache, tagRE, htmlRE, firstChar, lastChar
 
@@ -5285,7 +5594,7 @@
 	}
 
 /***/ },
-/* 63 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -5449,11 +5758,11 @@
 	}
 
 /***/ },
-/* 64 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var Path = __webpack_require__(79)
+	var Path = __webpack_require__(62)
 	var Cache = __webpack_require__(80)
 	var expressionCache = new Cache(1000)
 
@@ -5680,7 +5989,7 @@
 	exports.pathTestRE = pathTestRE
 
 /***/ },
-/* 65 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -5836,14 +6145,14 @@
 	}
 
 /***/ },
-/* 66 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var config = __webpack_require__(36)
-	var textParser = __webpack_require__(62)
-	var dirParser = __webpack_require__(63)
-	var templateParser = __webpack_require__(78)
+	var config = __webpack_require__(41)
+	var textParser = __webpack_require__(63)
+	var dirParser = __webpack_require__(64)
+	var templateParser = __webpack_require__(76)
 
 	/**
 	 * Compile a template and return a reusable composite link
@@ -6378,11 +6687,11 @@
 	}
 
 /***/ },
-/* 67 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var templateParser = __webpack_require__(78)
+	var templateParser = __webpack_require__(76)
 
 	/**
 	 * Process an element or a DocumentFragment based on a
@@ -6546,16 +6855,16 @@
 	}
 
 /***/ },
-/* 68 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
 
 	var handlers = {
-	  _default: __webpack_require__(91),
-	  radio: __webpack_require__(92),
-	  select: __webpack_require__(93),
-	  checkbox: __webpack_require__(94)
+	  _default: __webpack_require__(83),
+	  radio: __webpack_require__(84),
+	  select: __webpack_require__(85),
+	  checkbox: __webpack_require__(86)
 	}
 
 	module.exports = {
@@ -6607,15 +6916,15 @@
 	}
 
 /***/ },
-/* 69 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var config = __webpack_require__(36)
-	var Binding = __webpack_require__(59)
-	var arrayMethods = __webpack_require__(95)
+	var config = __webpack_require__(41)
+	var Binding = __webpack_require__(60)
+	var arrayMethods = __webpack_require__(87)
 	var arrayKeys = Object.getOwnPropertyNames(arrayMethods)
-	__webpack_require__(96)
+	__webpack_require__(88)
 
 	var uid = 0
 
@@ -6848,21 +7157,21 @@
 
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(71);
+	var content = __webpack_require__(72);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(76)(content, {});
+	var update = __webpack_require__(77)(content, {});
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
-		module.hot.accept("!!/Users/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/css-loader/index.js!/Users/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/vue-ui/components/progress/progress.css", function() {
-			var newContent = require("!!/Users/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/css-loader/index.js!/Users/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/vue-ui/components/progress/progress.css");
+		module.hot.accept("!!/home/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/css-loader/index.js!/home/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/vue-ui/components/progress/progress.css", function() {
+			var newContent = require("!!/home/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/css-loader/index.js!/home/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/vue-ui/components/progress/progress.css");
 			if(typeof newContent === 'string') newContent = [module.id, newContent, ''];
 			update(newContent);
 		});
@@ -6871,28 +7180,28 @@
 	}
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(97)();
 	exports.push([module.id, " /*\n * # Semantic UI\n * https://github.com/Semantic-Org/Semantic-UI\n * http://beta.semantic-ui.com/\n *\n * Copyright 2014 Contributors\n * Released under the MIT license\n * http://opensource.org/licenses/MIT\n *\n */\n\n\n\n/*******************************\n            Progress\n*******************************/\n\n.ui.progress {\n  position: relative;\n  display: block;\n  max-width: 100%;\n  border: 1px solid rgba(39, 41, 43, 0.15);\n  margin: 1em 0em 2.5em;\n  box-shadow: none;\n  background: rgba(0, 0, 0, 0.03);\n  padding: 0.2857em;\n  border-radius: 0.2857rem;\n}\n.ui.progress:first-child {\n  margin: 0em 0em 2.5em;\n}\n.ui.progress:last-child {\n  margin: 0em 0em 1.5em;\n}\n\n/* Indicating */\n.ui.indicating.progress .bar[style^=\"width: 3\"] {\n  background-color: #d9a65c;\n}\n.ui.indicating.progress .bar[style^=\"width: 4\"],\n.ui.indicating.progress .bar[style^=\"width: 5\"] {\n  background-color: #e6bb48;\n}\n.ui.indicating.progress .bar[style^=\"width: 6\"] {\n  background-color: #ddc928;\n}\n.ui.indicating.progress .bar[style^=\"width: 7\"],\n.ui.indicating.progress .bar[style^=\"width: 8\"] {\n  background-color: #b4d95c;\n}\n.ui.indicating.progress .bar[style^=\"width: 9\"],\n.ui.indicating.progress .bar[style^=\"width: 100\"] {\n  background-color: #66da81;\n}\n.ui.indicating.progress .bar[style^=\"width: 1%\"],\n.ui.indicating.progress .bar[style^=\"width: 2%\"],\n.ui.indicating.progress .bar[style^=\"width: 3%\"],\n.ui.indicating.progress .bar[style^=\"width: 4%\"],\n.ui.indicating.progress .bar[style^=\"width: 5%\"],\n.ui.indicating.progress .bar[style^=\"width: 6%\"],\n.ui.indicating.progress .bar[style^=\"width: 7%\"],\n.ui.indicating.progress .bar[style^=\"width: 8%\"],\n.ui.indicating.progress .bar[style^=\"width: 9%\"],\n.ui.indicating.progress .bar[style^=\"width: 1\"],\n.ui.indicating.progress .bar[style^=\"width: 2\"] {\n  background-color: #d95c5c;\n}\n\n/* Single Digits Last */\n.ui.indicating.progress .bar[style^=\"width: 1%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 2%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 3%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 4%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 5%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 6%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 7%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 8%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 9%\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 1\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 2\"] + .label {\n  color: #d95c5c;\n}\n.ui.indicating.progress .bar[style^=\"width: 3\"] + .label {\n  color: #d9a65c;\n}\n.ui.indicating.progress .bar[style^=\"width: 4\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 5\"] + .label {\n  color: #e6bb48;\n}\n.ui.indicating.progress .bar[style^=\"width: 6\"] + .label {\n  color: #ddc928;\n}\n.ui.indicating.progress .bar[style^=\"width: 7\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 8\"] + .label {\n  color: #b4d95c;\n}\n.ui.indicating.progress .bar[style^=\"width: 9\"] + .label,\n.ui.indicating.progress .bar[style^=\"width: 100\"] + .label {\n  color: #66da81;\n}\n\n\n/*******************************\n            Content\n*******************************/\n\n\n/* Activity Bar */\n.ui.progress .bar {\n  display: block;\n  line-height: 1;\n  position: relative;\n  width: 0%;\n  min-width: 0.25em;\n  height: 1.75em;\n  background: #888888;\n  border-radius: 0.2857rem;\n  -webkit-transition: width 0.5s ease, background-color 1s ease;\n          transition: width 0.5s ease, background-color 1s ease;\n}\n\n/* Percent Complete */\n.ui.progress .bar > .progress {\n  white-space: nowrap;\n  position: absolute;\n  width: auto;\n  font-size: 0.9em;\n  top: 50%;\n  right: 0.5em;\n  left: auto;\n  bottom: auto;\n  color: rgba(255, 255, 255, 0.8);\n  text-shadow: none;\n  margin-top: -0.5em;\n  font-weight: bold;\n  text-align: left;\n}\n\n/* Label */\n.ui.progress > .label {\n  position: absolute;\n  width: 100%;\n  font-size: 1em;\n  top: 100%;\n  right: auto;\n  left: 0%;\n  bottom: auto;\n  color: rgba(0, 0, 0, 0.8);\n  font-weight: bold;\n  text-shadow: none;\n  margin-top: 0.2em;\n  text-align: center;\n  -webkit-transition: color 1s ease;\n          transition: color 1s ease;\n}\n\n\n/*******************************\n             States\n*******************************/\n\n\n/*--------------\n     Success\n---------------*/\n\n.ui.progress.success .bar {\n  background-color: #5bbd72 !important;\n}\n.ui.progress.success .bar,\n.ui.progress.success .bar::after {\n  -webkit-animation: none !important;\n          animation: none !important;\n}\n.ui.progress.success > .label {\n  color: #356e36;\n}\n\n/*--------------\n     Warning\n---------------*/\n\n.ui.progress.warning .bar {\n  background-color: #f2c037 !important;\n}\n.ui.progress.warning .bar,\n.ui.progress.warning .bar::after {\n  -webkit-animation: none !important;\n          animation: none !important;\n}\n.ui.progress.warning > .label {\n  color: #825c01;\n}\n\n/*--------------\n     Error\n---------------*/\n\n.ui.progress.error .bar {\n  background-color: #d95c5c !important;\n}\n.ui.progress.error .bar,\n.ui.progress.error .bar::after {\n  -webkit-animation: none !important;\n          animation: none !important;\n}\n.ui.progress.error > .label {\n  color: #912d2b;\n}\n\n/*--------------\n     Active\n---------------*/\n\n.ui.active.progress .bar {\n  position: relative;\n  min-width: 3em;\n}\n.ui.active.progress .bar::after {\n  content: '';\n  opacity: 0;\n  position: absolute;\n  top: 0px;\n  left: 0px;\n  right: 0px;\n  bottom: 0px;\n  background: #ffffff;\n  border-radius: 0.2857rem;\n  -webkit-animation: progress-active 2s ease infinite;\n          animation: progress-active 2s ease infinite;\n}\n@-webkit-keyframes progress-active {\n  0% {\n    opacity: 0.3;\n    width: 0;\n  }\n  100% {\n    opacity: 0;\n    width: 100%;\n  }\n}\n@keyframes progress-active {\n  0% {\n    opacity: 0.3;\n    width: 0;\n  }\n  100% {\n    opacity: 0;\n    width: 100%;\n  }\n}\n\n/*--------------\n    Disabled\n---------------*/\n\n.ui.disabled.progress {\n  opacity: 0.35;\n}\n.ui.disabled.progress .bar,\n.ui.disabled.progress .bar::after {\n  -webkit-animation: none !important;\n          animation: none !important;\n}\n\n\n/*******************************\n           Variations\n*******************************/\n\n\n/*--------------\n    Inverted\n---------------*/\n\n\n/* bottom attached */\n.ui.inverted.progress {\n  background: rgba(255, 255, 255, 0.05);\n  border: none;\n}\n.ui.inverted.progress .bar {\n  background: #888888;\n}\n.ui.inverted.progress .bar > .progress {\n  color: #fafafa;\n}\n.ui.inverted.progress > .label {\n  color: #ffffff;\n}\n.ui.inverted.progress.success > .label {\n  color: #5bbd72;\n}\n.ui.inverted.progress.warning > .label {\n  color: #f2c037;\n}\n.ui.inverted.progress.error > .label {\n  color: #d95c5c;\n}\n\n/*--------------\n    Attached\n---------------*/\n\n\n/* bottom attached */\n.ui.progress.attached {\n  background: none transparent;\n  position: relative;\n  border: none;\n  margin: 0em;\n}\n.ui.progress.attached,\n.ui.progress.attached .bar {\n  display: block;\n  height: 0.25em;\n  padding: 0px;\n  overflow: hidden;\n  border-radius: 0em 0em 0.2857rem 0.2857rem;\n}\n.ui.progress.attached .bar {\n  border-radius: 0em;\n}\n\n/* top attached */\n.ui.progress.top.attached,\n.ui.progress.top.attached .bar {\n  top: 0px;\n  border-radius: 0.2857rem 0.2857rem 0em 0em;\n}\n.ui.progress.top.attached .bar {\n  border-radius: 0em;\n}\n\n/*--------------\n     Colors\n---------------*/\n\n.ui.black.progress .bar {\n  background-color: #1b1c1d;\n}\n.ui.blue.progress .bar {\n  background-color: #3b83c0;\n}\n.ui.green.progress .bar {\n  background-color: #5bbd72;\n}\n.ui.orange.progress .bar {\n  background-color: #e07b53;\n}\n.ui.pink.progress .bar {\n  background-color: #d9499a;\n}\n.ui.purple.progress .bar {\n  background-color: #564f8a;\n}\n.ui.red.progress .bar {\n  background-color: #d95c5c;\n}\n.ui.teal.progress .bar {\n  background-color: #00b5ad;\n}\n.ui.yellow.progress .bar {\n  background-color: #f2c61f;\n}\n.ui.black.inverted.progress .bar {\n  background-color: #333333;\n}\n.ui.blue.inverted.progress .bar {\n  background-color: #54c8ff;\n}\n.ui.green.inverted.progress .bar {\n  background-color: #2ecc40;\n}\n.ui.orange.inverted.progress .bar {\n  background-color: #ff851b;\n}\n.ui.pink.inverted.progress .bar {\n  background-color: #ff8edf;\n}\n.ui.purple.inverted.progress .bar {\n  background-color: #cdc6ff;\n}\n.ui.red.inverted.progress .bar {\n  background-color: #ff695e;\n}\n.ui.teal.inverted.progress .bar {\n  background-color: #6dffff;\n}\n.ui.yellow.inverted.progress .bar {\n  background-color: #ffe21f;\n}\n\n/*--------------\n     Sizes\n---------------*/\n\n.ui.small.progress .bar {\n  height: 14px;\n}\n", ""]);
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(73);
+	var content = __webpack_require__(74);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(76)(content, {});
+	var update = __webpack_require__(77)(content, {});
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
-		module.hot.accept("!!/Users/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/css-loader/index.js!/Users/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/vue-ui/components/rating/rating.css", function() {
-			var newContent = require("!!/Users/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/css-loader/index.js!/Users/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/vue-ui/components/rating/rating.css");
+		module.hot.accept("!!/home/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/css-loader/index.js!/home/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/vue-ui/components/rating/rating.css", function() {
+			var newContent = require("!!/home/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/css-loader/index.js!/home/agonbina/Github/vueui/vueui.github.io/_docs/_examples/node_modules/vue-ui/components/rating/rating.css");
 			if(typeof newContent === 'string') newContent = [module.id, newContent, ''];
 			update(newContent);
 		});
@@ -6901,237 +7210,14 @@
 	}
 
 /***/ },
-/* 73 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(97)();
 	exports.push([module.id, " /*\n * # Semantic UI\n * https://github.com/Semantic-Org/Semantic-UI\n * http://beta.semantic-ui.com/\n *\n * Copyright 2014 Contributors\n * Released under the MIT license\n * http://opensource.org/licenses/MIT\n *\n */\n\n\n\n/*******************************\n           Rating\n*******************************/\n\n.ui.rating {\n  display: inline-block;\n  font-size: 0em;\n  vertical-align: baseline;\n  margin: 0em 0.5rem 0em 0em;\n}\n.ui.rating:last-child {\n  margin-right: 0em;\n}\n.ui.rating:before {\n  display: block;\n  content: '';\n  visibility: hidden;\n  clear: both;\n  height: 0;\n}\n\n/* Icon */\n.ui.rating .icon {\n  cursor: pointer;\n  margin: 0em;\n  width: 1.1em;\n  text-align: center;\n  height: auto;\n  padding: 0em;\n  font-weight: normal;\n  font-style: normal;\n  vertical-align: baseline;\n}\n\n\n/*******************************\n             Types\n*******************************/\n\n\n/*-------------------\n        Star\n--------------------*/\n\n\n/* Inactive */\n.ui.star.rating .icon {\n  width: 1.1em;\n  color: rgba(0, 0, 0, 0.15);\n}\n\n/* Active Star */\n.ui.star.rating .active.icon {\n  color: #ffe623 !important;\n  text-shadow: 0px -1px 0px #cfa300, -1px 0px 0px #cfa300, 0px 1px 0px #cfa300, 1px 0px 0px #cfa300;\n}\n\n/* Selected Star */\n.ui.star.rating .icon.selected,\n.ui.star.rating .icon.selected.active {\n  color: #ffb70a !important;\n}\n.ui.star.rating.partial {\n  position: relative;\n  z-index: 1;\n}\n.ui.star.rating.partial:before {\n  position: absolute;\n  z-index: -1;\n}\n\n/*-------------------\n        Heart\n--------------------*/\n\n.ui.heart.rating .icon {\n  width: 1.25em;\n  color: rgba(0, 0, 0, 0.15);\n}\n\n/* Active Heart */\n.ui.heart.rating .active.icon {\n  color: #ff2733 !important;\n  text-shadow: 0px -1px 0px #9e0000, -1px 0px 0px #9e0000, 0px 1px 0px #9e0000, 1px 0px 0px #9e0000;\n}\n\n/* Selected Heart */\n.ui.heart.rating .icon.selected,\n.ui.heart.rating .icon.selected.active {\n  color: #ff2733 !important;\n}\n\n\n/*******************************\n             States\n*******************************/\n\n\n/* Inactive Icon */\n.ui.rating .icon {\n  color: rgba(0, 0, 0, 0.15);\n}\n\n/* Active Icon */\n.ui.rating .active.icon {\n  color: rgba(0, 0, 0, 0.85);\n}\n\n/* Selected Icon */\n.ui.rating .icon.selected,\n.ui.rating .icon.selected.active {\n  color: rgba(0, 0, 0, 0.8);\n}\n\n/*-------------------\n       Disabled\n--------------------*/\n\n\n/* disabled rating */\n.ui.disabled.rating .icon {\n  cursor: default;\n}\n\n/*-------------------\n     Interacting (Active)\n--------------------*/\n\n\n/* Selected Rating */\n.ui.rating.selected .active.icon {\n  opacity: 0.5;\n}\n.ui.rating.selected .icon.selected,\n.ui.rating .icon.selected {\n  opacity: 1;\n}\n\n\n/*******************************\n          Variations\n*******************************/\n\n.ui.mini.rating .icon {\n  font-size: 0.7rem;\n}\n.ui.tiny.rating .icon {\n  font-size: 0.8rem;\n}\n.ui.small.rating .icon {\n  font-size: 0.875rem;\n}\n.ui.rating .icon {\n  font-size: 1rem;\n}\n.ui.large.rating .icon {\n  font-size: 1.1rem;\n}\n.ui.huge.rating .icon {\n  font-size: 1.5rem;\n}\n.ui.massive.rating .icon {\n  font-size: 2rem;\n}\n\n/* Realign */\n.ui.large.rating,\n.ui.huge.rating,\n.ui.massive.rating {\n  vertical-align: middle;\n}\n\n\n/*******************************\n         Theme Overrides\n*******************************/\n\n@font-face {\n  font-family: 'Rating';\n  src: url(data:application/x-font-ttf;charset=utf-8;base64,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) format('truetype'), url(data:application/font-woff;charset=utf-8;base64,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kIiRi5MI5vdUFfcni4vCBYufhJx8mn2ZepJ3i3aLeoR9fX18g3qLdwiLVAUO+yaLshWL+AQFi5GNkY+RjpCQj5KNj42PjI+LCPfAiwWPi4+Kj4mRiZCHj4aPhY2Fi4UIi/wEBYuEiYWHhoeGhoeFiIiKhoqHi4GLhI6EkQj7EvcN+xL7DQWEhYOIgouHi4eLh42EjoaPiJCHkImRi5IIDov3XRWLko2Rj5Kltq+vuKW4pbuZvYu9i7t9uHG4ca9npWCPhI2Fi4SLhYmEh4RxYGdoXnAIXnFbflmLWYtbmF6lXqZnrnG2h5KJkouRCLCLFaRkq2yxdLF0tH+4i7iLtJexorGiq6qksm64Z61goZZ3kXaLdItnfm1ycnJybX9oiwhoi22XcqRypH6pi6+LopGglp9gdWdpbl4I9xiwFYuHjIiOiI6IjoqPi4+LjoyOjo2OjY6Lj4ubkJmXl5eWmZGbi4+LjoyOjo2OjY6LjwiLj4mOiY6IjYiNh4tzi3eCenp6eoJ3i3MIDov3XRWLko2Sj5GouK+utqW3pbqYvouci5yJnIgIm6cFjY6NjI+LjIuNi42JjYqOio+JjomOiY6KjomOiY6JjoqNioyKjomMiYuHi4qLiouLCHdnbVVjQ2NDbVV3Zwh9cgWJiIiJiIuJi36SdJiIjYmOi46LjY+UlJlvl3KcdJ90oHeie6WHkYmSi5IIsIsVqlq0Z711CKGzBXqXfpqCnoKdhp6LoIuikaCWn2B1Z2luXgj3GLAVi4eMiI6IjoiOio+Lj4uOjI6OjY6NjouPi5uQmZeXl5aZkZuLj4uOjI6OjY6NjouPCIuPiY6JjoiNiI2Hi3OLd4J6enp6gneLcwji+10VoLAFtI+wmK2hrqKnqKKvdq1wp2uhCJ2rBZ1/nHycepx6mHqWeY+EjYWLhIuEiYWHhIR/gH1+fG9qaXJmeWV5Y4Jhiwi53BXb9yQFjIKMg4uEi3CDc3x1fHV3fHOBCA6L1BWL90sFi5WPlJKSkpKTj5aLCNmLBZKPmJqepJaZlZeVlY+Qj5ONl42WjpeOmI+YkZWTk5OSk46Vi5uLmYiYhZiFlIGSfgiSfo55i3WLeYd5gXgIvosFn4uchJl8mn2Seot3i3qGfIJ9jYSLhYuEi3yIfoR+i4eLh4uHi3eGen99i3CDdnt8CHt8dYNwiwhmiwV5i3mNeY95kHeRc5N1k36Ph4sIOYsFgIuDjoSShJKHlIuVCLCdFYuGjIePiI+Hj4mQi5CLj42Pj46OjY+LkIuQiZCIjoePh42Gi4aLh4mHh4eIioaLhgjUeRWUiwWNi46Lj4qOi4+KjYqOi4+Kj4mQio6KjYqNio+Kj4mQio6KjIqzfquEpIsIrosFr4uemouri5CKkYqQkY6QkI6SjpKNkouSi5KJkoiRlZWQlouYi5CKkImRiZGJj4iOCJGMkI+PlI+UjZKLkouViJODk4SSgo+CiwgmiwWLlpCalJ6UnpCbi5aLnoiYhJSFlH+QeYuGhoeDiYCJf4h/h3+IfoWBg4KHh4SCgH4Ii4qIiYiGh4aIh4mIiIiIh4eGh4aHh4eHiIiHiIeHiIiHiIeKh4mIioiLCIKLi/tLBQ6L90sVi/dLBYuVj5OSk5KSk46WiwjdiwWPi5iPoZOkk6CRnZCdj56Nn4sIq4sFpougg5x8m3yTd4txCIuJBZd8kHuLd4uHi4eLh5J+jn6LfIuEi4SJhZR9kHyLeot3hHp8fH19eoR3iwhYiwWVeI95i3mLdIh6hH6EfoKBfoV+hX2He4uBi4OPg5KFkYaTh5SHlYiTipOKk4qTiJMIiZSIkYiPgZSBl4CaeKR+moSPCD2LBYCLg4+EkoSSh5SLlQiw9zgVi4aMh4+Ij4ePiZCLkIuPjY+Pjo6Nj4uQi5CJkIiOh4+HjYaLhouHiYeHh4iKhouGCNT7OBWUiwWOi46Kj4mPio+IjoiPh4+IjoePiI+Hj4aPho6HjoiNiI6Hj4aOho6Ii4qWfpKDj4YIk4ORgY5+j36OgI1/jYCPg5CGnYuXj5GUkpSOmYuei5aGmoKfgp6GmouWCPCLBZSLlI+SkpOTjpOLlYuSiZKHlIeUho+Fi46PjY+NkY2RjJCLkIuYhpaBlY6RjZKLkgiLkomSiJKIkoaQhY6MkIyRi5CLm4aXgpOBkn6Pe4sIZosFcotrhGN9iouIioaJh4qHiomKiYqIioaKh4mHioiKiYuHioiLh4qIi4mLCIKLi/tLBQ77lIv3txWLkpCPlo0I9yOgzPcWBY6SkI+RiwiL/BL7FUcFh4mHioiLh4uIjImOiY6KjouPi4yLjYyOCKP3IyPwBYaQiZCLjwgOi/fFFYu1l6yjoqOjrZe2i5aLl4mYh5eHloWWhJaElIWShZOE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) format('woff');\n  font-weight: normal;\n  font-style: normal;\n}\n.ui.rating .icon {\n  font-family: 'Rating';\n  line-height: 1;\n  height: 1em;\n  -webkit-backface-visibility: hidden;\n          backface-visibility: hidden;\n  font-weight: normal;\n  font-style: normal;\n  text-align: center;\n}\n\n/* Empty Star */\n.ui.rating .icon:before {\n  content: '\\f006';\n}\n\n/* Active Star */\n.ui.rating .active.icon:before {\n  content: '\\f005';\n}\n\n/*-------------------\n        Star\n--------------------*/\n\n\n/* Unfilled Star */\n.ui.star.rating .icon:before {\n  content: '\\f005';\n}\n\n/* Active Star */\n.ui.star.rating .active.icon:before {\n  content: '\\f005';\n}\n\n/* Partial */\n.ui.star.rating .partial.icon:before {\n  content: '\\f006';\n}\n.ui.star.rating .partial.icon {\n  content: '\\f005';\n}\n\n/*-------------------\n        Heart\n--------------------*/\n\n\n/* Empty Heart\n.ui.heart.rating .icon:before {\n  content: '\\f08a';\n}\n*/\n.ui.heart.rating .icon:before {\n  content: '\\f004';\n}\n/* Active */\n.ui.heart.rating .active.icon:before {\n  content: '\\f004';\n}\n\n\n/*******************************\n         Site Overrides\n*******************************/\n\n", ""]);
 
 /***/ },
-/* 74 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	module.exports = {
-	    paramAttributes: [ 'class' ],
-
-	    compiled: function () {
-	        var vm = this;
-	        var componentName = this.$options.name.toLowerCase();
-
-	        if(vm.class) {
-	            var $element = $(vm.$el).find('.ui.' + componentName) || $(vm.$el);
-	            $element.addClass(vm.class);
-	        }
-	    }
-	};
-
-/***/ },
 /* 75 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	exports.bindBehaviorsMixin = __webpack_require__(98);
-	exports.appendToClassMixin = __webpack_require__(74);
-
-/***/ },
-/* 76 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	var stylesInDom = {},
-		memoize = function(fn) {
-			var memo;
-			return function () {
-				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-				return memo;
-			};
-		},
-		isIE9 = memoize(function() {
-			return /msie 9\b/.test(window.navigator.userAgent.toLowerCase());
-		}),
-		getHeadElement = memoize(function () {
-			return document.head || document.getElementsByTagName("head")[0];
-		}),
-		singletonElement = null,
-		singletonCounter = 0;
-
-	module.exports = function(list, options) {
-		if(false) {
-			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-		}
-
-		options = options || {};
-		// Force single-tag solution on IE9, which has a hard limit on the # of <style>
-		// tags it will allow on a page
-		if (typeof options.singleton === "undefined") options.singleton = isIE9();
-
-		var styles = listToStyles(list);
-		addStylesToDom(styles, options);
-
-		return function update(newList) {
-			var mayRemove = [];
-			for(var i = 0; i < styles.length; i++) {
-				var item = styles[i];
-				var domStyle = stylesInDom[item.id];
-				domStyle.refs--;
-				mayRemove.push(domStyle);
-			}
-			if(newList) {
-				var newStyles = listToStyles(newList);
-				addStylesToDom(newStyles, options);
-			}
-			for(var i = 0; i < mayRemove.length; i++) {
-				var domStyle = mayRemove[i];
-				if(domStyle.refs === 0) {
-					for(var j = 0; j < domStyle.parts.length; j++)
-						domStyle.parts[j]();
-					delete stylesInDom[domStyle.id];
-				}
-			}
-		};
-	}
-
-	function addStylesToDom(styles, options) {
-		for(var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-			if(domStyle) {
-				domStyle.refs++;
-				for(var j = 0; j < domStyle.parts.length; j++) {
-					domStyle.parts[j](item.parts[j]);
-				}
-				for(; j < item.parts.length; j++) {
-					domStyle.parts.push(addStyle(item.parts[j], options));
-				}
-			} else {
-				var parts = [];
-				for(var j = 0; j < item.parts.length; j++) {
-					parts.push(addStyle(item.parts[j], options));
-				}
-				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-			}
-		}
-	}
-
-	function listToStyles(list) {
-		var styles = [];
-		var newStyles = {};
-		for(var i = 0; i < list.length; i++) {
-			var item = list[i];
-			var id = item[0];
-			var css = item[1];
-			var media = item[2];
-			var sourceMap = item[3];
-			var part = {css: css, media: media, sourceMap: sourceMap};
-			if(!newStyles[id])
-				styles.push(newStyles[id] = {id: id, parts: [part]});
-			else
-				newStyles[id].parts.push(part);
-		}
-		return styles;
-	}
-
-	function createStyleElement() {
-		var styleElement = document.createElement("style");
-		var head = getHeadElement();
-		styleElement.type = "text/css";
-		head.appendChild(styleElement);
-		return styleElement;
-	}
-
-	function addStyle(obj, options) {
-		var styleElement, update, remove;
-
-		if (options.singleton) {
-			var styleIndex = singletonCounter++;
-			styleElement = singletonElement || (singletonElement = createStyleElement());
-			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
-			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
-		} else {
-			styleElement = createStyleElement();
-			update = applyToTag.bind(null, styleElement);
-			remove = function () {
-				styleElement.parentNode.removeChild(styleElement);
-			};
-		}
-
-		update(obj);
-
-		return function updateStyle(newObj) {
-			if(newObj) {
-				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
-					return;
-				update(obj = newObj);
-			} else {
-				remove();
-			}
-		};
-	}
-
-	function replaceText(source, id, replacement) {
-		var boundaries = ["/** >>" + id + " **/", "/** " + id + "<< **/"];
-		var start = source.lastIndexOf(boundaries[0]);
-		var wrappedReplacement = replacement
-			? (boundaries[0] + replacement + boundaries[1])
-			: "";
-		if (source.lastIndexOf(boundaries[0]) >= 0) {
-			var end = source.lastIndexOf(boundaries[1]) + boundaries[1].length;
-			return source.slice(0, start) + wrappedReplacement + source.slice(end);
-		} else {
-			return source + wrappedReplacement;
-		}
-	}
-
-	function applyToSingletonTag(styleElement, index, remove, obj) {
-		var css = remove ? "" : obj.css;
-
-		if(styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = replaceText(styleElement.styleSheet.cssText, index, css);
-		} else {
-			var cssNode = document.createTextNode(css);
-			var childNodes = styleElement.childNodes;
-			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
-			if (childNodes.length) {
-				styleElement.insertBefore(cssNode, childNodes[index]);
-			} else {
-				styleElement.appendChild(cssNode);
-			}
-		}
-	}
-
-	function applyToTag(styleElement, obj) {
-		var css = obj.css;
-		var media = obj.media;
-		var sourceMap = obj.sourceMap;
-
-		if(sourceMap && typeof btoa === "function") {
-			try {
-				css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(JSON.stringify(sourceMap)) + " */";
-				css = "@import url(\"data:stylesheet/css;base64," + btoa(css) + "\")";
-			} catch(e) {}
-		}
-
-		if(media) {
-			styleElement.setAttribute("media", media)
-		}
-
-		if(styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = css;
-		} else {
-			while(styleElement.firstChild) {
-				styleElement.removeChild(styleElement.firstChild);
-			}
-			styleElement.appendChild(document.createTextNode(css));
-		}
-	}
-
-
-/***/ },
-/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -7201,9 +7287,10 @@
 	module.exports = Batcher
 
 /***/ },
-/* 78 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var _ = __webpack_require__(12)
 	var Cache = __webpack_require__(80)
 	var templateCache = new Cache(100)
 
@@ -7212,11 +7299,13 @@
 	 * https://bugs.webkit.org/show_bug.cgi?id=137755
 	 */
 
-	var hasBrokenTemplate = (function () {
-	  var a = document.createElement('div')
-	  a.innerHTML = '<template>1</template>'
-	  return !a.cloneNode(true).firstChild.innerHTML
-	})()
+	var hasBrokenTemplate = _.inBrowser
+	  ? (function () {
+	      var a = document.createElement('div')
+	      a.innerHTML = '<template>1</template>'
+	      return !a.cloneNode(true).firstChild.innerHTML
+	    })()
+	  : false
 
 	var map = {
 	  _default : [0, '', ''],
@@ -7425,309 +7514,227 @@
 	}
 
 /***/ },
+/* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isIE9 = memoize(function() {
+			return /msie 9\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0;
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isIE9();
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function createStyleElement() {
+		var styleElement = document.createElement("style");
+		var head = getHeadElement();
+		styleElement.type = "text/css";
+		head.appendChild(styleElement);
+		return styleElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement());
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else {
+			styleElement = createStyleElement();
+			update = applyToTag.bind(null, styleElement);
+			remove = function () {
+				styleElement.parentNode.removeChild(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	function replaceText(source, id, replacement) {
+		var boundaries = ["/** >>" + id + " **/", "/** " + id + "<< **/"];
+		var start = source.lastIndexOf(boundaries[0]);
+		var wrappedReplacement = replacement
+			? (boundaries[0] + replacement + boundaries[1])
+			: "";
+		if (source.lastIndexOf(boundaries[0]) >= 0) {
+			var end = source.lastIndexOf(boundaries[1]) + boundaries[1].length;
+			return source.slice(0, start) + wrappedReplacement + source.slice(end);
+		} else {
+			return source + wrappedReplacement;
+		}
+	}
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(styleElement.styleSheet.cssText, index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap && typeof btoa === "function") {
+			try {
+				css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(JSON.stringify(sourceMap)) + " */";
+				css = "@import url(\"data:stylesheet/css;base64," + btoa(css) + "\")";
+			} catch(e) {}
+		}
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	module.exports = {
+	    paramAttributes: [ 'class' ],
+
+	    compiled: function () {
+	        var vm = this;
+	        var componentName = this.$options.name.toLowerCase();
+
+	        if(vm.class) {
+	            var $element = $(vm.$el).find('.ui.' + componentName) || $(vm.$el);
+	            $element.addClass(vm.class);
+	        }
+	    }
+	};
+
+/***/ },
 /* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(12)
-	var Cache = __webpack_require__(80)
-	var pathCache = new Cache(1000)
-	var identRE = /^[$_a-zA-Z]+[\w$]*$/
-
-	/**
-	 * Path-parsing algorithm scooped from Polymer/observe-js
-	 */
-
-	var pathStateMachine = {
-	  'beforePath': {
-	    'ws': ['beforePath'],
-	    'ident': ['inIdent', 'append'],
-	    '[': ['beforeElement'],
-	    'eof': ['afterPath']
-	  },
-
-	  'inPath': {
-	    'ws': ['inPath'],
-	    '.': ['beforeIdent'],
-	    '[': ['beforeElement'],
-	    'eof': ['afterPath']
-	  },
-
-	  'beforeIdent': {
-	    'ws': ['beforeIdent'],
-	    'ident': ['inIdent', 'append']
-	  },
-
-	  'inIdent': {
-	    'ident': ['inIdent', 'append'],
-	    '0': ['inIdent', 'append'],
-	    'number': ['inIdent', 'append'],
-	    'ws': ['inPath', 'push'],
-	    '.': ['beforeIdent', 'push'],
-	    '[': ['beforeElement', 'push'],
-	    'eof': ['afterPath', 'push']
-	  },
-
-	  'beforeElement': {
-	    'ws': ['beforeElement'],
-	    '0': ['afterZero', 'append'],
-	    'number': ['inIndex', 'append'],
-	    "'": ['inSingleQuote', 'append', ''],
-	    '"': ['inDoubleQuote', 'append', '']
-	  },
-
-	  'afterZero': {
-	    'ws': ['afterElement', 'push'],
-	    ']': ['inPath', 'push']
-	  },
-
-	  'inIndex': {
-	    '0': ['inIndex', 'append'],
-	    'number': ['inIndex', 'append'],
-	    'ws': ['afterElement'],
-	    ']': ['inPath', 'push']
-	  },
-
-	  'inSingleQuote': {
-	    "'": ['afterElement'],
-	    'eof': 'error',
-	    'else': ['inSingleQuote', 'append']
-	  },
-
-	  'inDoubleQuote': {
-	    '"': ['afterElement'],
-	    'eof': 'error',
-	    'else': ['inDoubleQuote', 'append']
-	  },
-
-	  'afterElement': {
-	    'ws': ['afterElement'],
-	    ']': ['inPath', 'push']
-	  }
-	}
-
-	function noop () {}
-
-	/**
-	 * Determine the type of a character in a keypath.
-	 *
-	 * @param {Char} char
-	 * @return {String} type
-	 */
-
-	function getPathCharType (char) {
-	  if (char === undefined) {
-	    return 'eof'
-	  }
-
-	  var code = char.charCodeAt(0)
-
-	  switch(code) {
-	    case 0x5B: // [
-	    case 0x5D: // ]
-	    case 0x2E: // .
-	    case 0x22: // "
-	    case 0x27: // '
-	    case 0x30: // 0
-	      return char
-
-	    case 0x5F: // _
-	    case 0x24: // $
-	      return 'ident'
-
-	    case 0x20: // Space
-	    case 0x09: // Tab
-	    case 0x0A: // Newline
-	    case 0x0D: // Return
-	    case 0xA0:  // No-break space
-	    case 0xFEFF:  // Byte Order Mark
-	    case 0x2028:  // Line Separator
-	    case 0x2029:  // Paragraph Separator
-	      return 'ws'
-	  }
-
-	  // a-z, A-Z
-	  if ((0x61 <= code && code <= 0x7A) ||
-	      (0x41 <= code && code <= 0x5A)) {
-	    return 'ident'
-	  }
-
-	  // 1-9
-	  if (0x31 <= code && code <= 0x39) {
-	    return 'number'
-	  }
-
-	  return 'else'
-	}
-
-	/**
-	 * Parse a string path into an array of segments
-	 * Todo implement cache
-	 *
-	 * @param {String} path
-	 * @return {Array|undefined}
-	 */
-
-	function parsePath (path) {
-	  var keys = []
-	  var index = -1
-	  var mode = 'beforePath'
-	  var c, newChar, key, type, transition, action, typeMap
-
-	  var actions = {
-	    push: function() {
-	      if (key === undefined) {
-	        return
-	      }
-	      keys.push(key)
-	      key = undefined
-	    },
-	    append: function() {
-	      if (key === undefined) {
-	        key = newChar
-	      } else {
-	        key += newChar
-	      }
-	    }
-	  }
-
-	  function maybeUnescapeQuote () {
-	    var nextChar = path[index + 1]
-	    if ((mode === 'inSingleQuote' && nextChar === "'") ||
-	        (mode === 'inDoubleQuote' && nextChar === '"')) {
-	      index++
-	      newChar = nextChar
-	      actions.append()
-	      return true
-	    }
-	  }
-
-	  while (mode) {
-	    index++
-	    c = path[index]
-
-	    if (c === '\\' && maybeUnescapeQuote()) {
-	      continue
-	    }
-
-	    type = getPathCharType(c)
-	    typeMap = pathStateMachine[mode]
-	    transition = typeMap[type] || typeMap['else'] || 'error'
-
-	    if (transition === 'error') {
-	      return // parse error
-	    }
-
-	    mode = transition[0]
-	    action = actions[transition[1]] || noop
-	    newChar = transition[2] === undefined
-	      ? c
-	      : transition[2]
-	    action()
-
-	    if (mode === 'afterPath') {
-	      return keys
-	    }
-	  }
-	}
-
-	/**
-	 * Format a accessor segment based on its type.
-	 *
-	 * @param {String} key
-	 * @return {Boolean}
-	 */
-
-	function formatAccessor(key) {
-	  if (identRE.test(key)) { // identifier
-	    return '.' + key
-	  } else if (+key === key >>> 0) { // bracket index
-	    return '[' + key + ']';
-	  } else { // bracket string
-	    return '["' + key.replace(/"/g, '\\"') + '"]';
-	  }
-	}
-
-	/**
-	 * Compiles a getter function with a fixed path.
-	 *
-	 * @param {Array} path
-	 * @return {Function}
-	 */
-
-	exports.compileGetter = function (path) {
-	  var body =
-	    'try{return o' +
-	    path.map(formatAccessor).join('') +
-	    '}catch(e){};'
-	  return new Function('o', body)
-	}
-
-	/**
-	 * External parse that check for a cache hit first
-	 *
-	 * @param {String} path
-	 * @return {Array|undefined}
-	 */
-
-	exports.parse = function (path) {
-	  var hit = pathCache.get(path)
-	  if (!hit) {
-	    hit = parsePath(path)
-	    if (hit) {
-	      hit.get = exports.compileGetter(hit)
-	      pathCache.put(path, hit)
-	    }
-	  }
-	  return hit
-	}
-
-	/**
-	 * Get from an object from a path string
-	 *
-	 * @param {Object} obj
-	 * @param {String} path
-	 */
-
-	exports.get = function (obj, path) {
-	  path = exports.parse(path)
-	  if (path) {
-	    return path.get(obj)
-	  }
-	}
-
-	/**
-	 * Set on an object from a path
-	 *
-	 * @param {Object} obj
-	 * @param {String | Array} path
-	 * @param {*} val
-	 */
-
-	exports.set = function (obj, path, val) {
-	  if (typeof path === 'string') {
-	    path = exports.parse(path)
-	  }
-	  if (!path || !_.isObject(obj)) {
-	    return false
-	  }
-	  var last, key
-	  for (var i = 0, l = path.length - 1; i < l; i++) {
-	    last = obj
-	    key = path[i]
-	    obj = obj[key]
-	    if (!_.isObject(obj)) {
-	      obj = {}
-	      last.$add(key, obj)
-	    }
-	  }
-	  key = path[i]
-	  if (key in obj) {
-	    obj[key] = val
-	  } else {
-	    obj.$add(key, val)
-	  }
-	  return true
-	}
+	
+	exports.bindBehaviorsMixin = __webpack_require__(98);
+	exports.appendToClassMixin = __webpack_require__(78);
 
 /***/ },
 /* 80 */
@@ -7851,6 +7858,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
+	var addClass = _.addClass
+	var removeClass = _.removeClass
 	var transDurationProp = _.transitionProp + 'Duration'
 	var animDurationProp = _.animationProp + 'Duration'
 
@@ -7905,7 +7914,6 @@
 	function run (job) {
 
 	  var el = job.el
-	  var classList = el.classList
 	  var data = el.__v_trans
 	  var cls = job.cls
 	  var cb = job.cb
@@ -7915,7 +7923,7 @@
 	  if (job.dir > 0) { // ENTER
 	    if (transitionType === 1) {
 	      // trigger transition by removing enter class
-	      classList.remove(cls)
+	      removeClass(el, cls)
 	      // only need to listen for transitionend if there's
 	      // a user callback
 	      if (cb) setupTransitionCb(_.transitionEndEvent)
@@ -7923,11 +7931,11 @@
 	      // animations are triggered when class is added
 	      // so we just listen for animationend to remove it.
 	      setupTransitionCb(_.animationEndEvent, function () {
-	        classList.remove(cls)
+	        removeClass(el, cls)
 	      })
 	    } else {
 	      // no transition applicable
-	      classList.remove(cls)
+	      removeClass(el, cls)
 	      if (cb) cb()
 	    }
 	  } else { // LEAVE
@@ -7939,11 +7947,11 @@
 	        : _.animationEndEvent
 	      setupTransitionCb(event, function () {
 	        op()
-	        classList.remove(cls)
+	        removeClass(el, cls)
 	      })
 	    } else {
 	      op()
-	      classList.remove(cls)
+	      removeClass(el, cls)
 	      if (cb) cb()
 	    }
 	  }
@@ -8019,23 +8027,22 @@
 	 */
 
 	module.exports = function (el, direction, op, data, cb) {
-	  var classList = el.classList
 	  var prefix = data.id || 'v'
 	  var enterClass = prefix + '-enter'
 	  var leaveClass = prefix + '-leave'
 	  // clean up potential previous unfinished transition
 	  if (data.callback) {
 	    _.off(el, data.event, data.callback)
-	    classList.remove(enterClass)
-	    classList.remove(leaveClass)
+	    removeClass(el, enterClass)
+	    removeClass(el, leaveClass)
 	    data.event = data.callback = null
 	  }
 	  if (direction > 0) { // enter
-	    classList.add(enterClass)
+	    addClass(el, enterClass)
 	    op()
 	    push(el, direction, null, enterClass, cb)
 	  } else { // leave
-	    classList.add(leaveClass)
+	    addClass(el, leaveClass)
 	    push(el, direction, op, leaveClass, cb)
 	  }
 	}
@@ -8090,54 +8097,6 @@
 
 /***/ },
 /* 83 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = "<div v-el=\"modal\" v-class=\"type, size\" class=\"ui modal\"><i class=\"close icon\"></i><div class=\"header\"><content select=\".header\">{{* title}}</content></div><content select=\".content\"></content><div class=\"actions\"><content select=\".actions\"><div class=\"ui negative button\">Cancel</div><div class=\"ui positive right labeled icon button\">OK<i class=\"checkmark icon\"></i></div></content></div></div>";
-
-/***/ },
-/* 84 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = "<div v-el=\"dropdown\" class=\"ui dropdown\"><input type=\"hidden\" name=\"{{* name}}\"/><div class=\"text\">{{* label}}</div><i class=\"dropdown icon\"></i><content select=\".menu\"><div class=\"menu\"><content select=\".item\"><div v-repeat=\"options\" v-attr=\"data-value: value\" class=\"item\">{{* text}}</div></content></div></content></div>";
-
-/***/ },
-/* 85 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = "<div v-el=\"accordion\" class=\"ui accordion\"><div v-repeat=\"sections\"><div class=\"title\"><content select=\".title\"><i class=\"dropdown icon\"></i>{{* title}}</content></div><div class=\"content\"><content select=\".content\">{{* content}}</content></div></div></div>";
-
-/***/ },
-/* 86 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = "<div class=\"ui popup\"><content><div v-if=\"title\" class=\"header\">{{* title}}</div><content select=\".content\"><div class=\"content\">{{* content}}</div></content></content></div>";
-
-/***/ },
-/* 87 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = "<div v-class=\"active : isActive, status\" class=\"ui progress\"><div v-style=\"width: progress + '%'\" class=\"bar\"><content select=\".progress\"><div class=\"progress\">{{progress}}%</div></content></div><content select=\".label\"><div class=\"label\">{{ isActive ? 'Running' : 'Done' }}</div></content></div>";
-
-/***/ },
-/* 88 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = "<div v-el=\"checkbox\" class=\"ui checkbox\"><input type=\"{{* type}}\" name=\"{{* name}}\" v-attr=\"value: value\"/><content select=\"label\"><label v-if=\"type === 'checkbox'\">{{* label}}</label><label v-if=\"type === 'radio'\">{{* label ? label : value}}</label></content></div>";
-
-/***/ },
-/* 89 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = "<aside v-class=\"direction\" v-el=\"sidebar\" class=\"ui sidebar\"><content><h1>Sidebar</h1></content></aside>";
-
-/***/ },
-/* 90 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = "<div v-class=\"selected: selected &gt; 0, disabled: disabled\" class=\"ui rating\"><i v-repeat=\"icons\" v-class=\"active: $value &lt;= rating, selected: $value &lt;= selected\" v-on=\"mouseenter: $select($value), mouseleave: selected = 0, click: $setRating($value)\" class=\"icon\"></i></div>";
-
-/***/ },
-/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -8259,7 +8218,7 @@
 	}
 
 /***/ },
-/* 92 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -8290,11 +8249,11 @@
 	}
 
 /***/ },
-/* 93 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
-	var Watcher = __webpack_require__(37)
+	var Watcher = __webpack_require__(42)
 
 	module.exports = {
 
@@ -8462,7 +8421,7 @@
 	}
 
 /***/ },
-/* 94 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -8492,7 +8451,7 @@
 	}
 
 /***/ },
-/* 95 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -8587,7 +8546,7 @@
 	module.exports = arrayMethods
 
 /***/ },
-/* 96 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var _ = __webpack_require__(12)
@@ -8665,6 +8624,54 @@
 	    }
 	  }
 	)
+
+/***/ },
+/* 89 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<div v-el=\"accordion\" class=\"ui accordion\"><div v-repeat=\"sections\"><div class=\"title\"><content select=\".title\"><i class=\"dropdown icon\"></i>{{* title}}</content></div><div class=\"content\"><content select=\".content\">{{* content}}</content></div></div></div>";
+
+/***/ },
+/* 90 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<div v-el=\"checkbox\" class=\"ui checkbox\"><input type=\"{{* type}}\" name=\"{{* name}}\" v-attr=\"value: value\"/><content select=\"label\"><label v-if=\"type === 'checkbox'\">{{* label}}</label><label v-if=\"type === 'radio'\">{{* label ? label : value}}</label></content></div>";
+
+/***/ },
+/* 91 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<div v-el=\"dropdown\" class=\"ui dropdown\"><input type=\"hidden\" name=\"{{* name}}\"/><div class=\"text\">{{* label}}</div><i class=\"dropdown icon\"></i><content select=\".menu\"><div class=\"menu\"><content select=\".item\"><div v-repeat=\"options\" v-attr=\"data-value: value\" class=\"item\">{{* text}}</div></content></div></content></div>";
+
+/***/ },
+/* 92 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<div v-el=\"modal\" v-class=\"type, size\" class=\"ui modal\"><i class=\"close icon\"></i><div class=\"header\"><content select=\".header\">{{* title}}</content></div><content select=\".content\"></content><div class=\"actions\"><content select=\".actions\"><div class=\"ui negative button\">Cancel</div><div class=\"ui positive right labeled icon button\">OK<i class=\"checkmark icon\"></i></div></content></div></div>";
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<div class=\"ui popup\"><content><div v-if=\"title\" class=\"header\">{{* title}}</div><content select=\".content\"><div class=\"content\">{{* content}}</div></content></content></div>";
+
+/***/ },
+/* 94 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<div v-class=\"active : isActive, status\" class=\"ui progress\"><div v-style=\"width: progress + '%'\" class=\"bar\"><content select=\".progress\"><div class=\"progress\">{{progress}}%</div></content></div><content select=\".label\"><div class=\"label\">{{ isActive ? 'Running' : 'Done' }}</div></content></div>";
+
+/***/ },
+/* 95 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<div v-class=\"selected: selected &gt; 0, disabled: disabled\" class=\"ui rating\"><i v-repeat=\"icons\" v-class=\"active: $value &lt;= rating, selected: $value &lt;= selected\" v-on=\"mouseenter: $select($value), mouseleave: selected = 0, click: $setRating($value)\" class=\"icon\"></i></div>";
+
+/***/ },
+/* 96 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = "<aside v-class=\"direction\" v-el=\"sidebar\" class=\"ui sidebar\"><content><h1>Sidebar</h1></content></aside>";
 
 /***/ },
 /* 97 */
