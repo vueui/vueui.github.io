@@ -1,0 +1,83 @@
+
+// Usage docs
+
+h1 Usage
+:markdown
+   ```html
+   <ui-dropdown
+         type="search selection"
+         label="Gender"
+         options="selectOptions"></ui-dropdown>
+   ```
+   ```js
+   new Vue({
+      data: {
+         selectOptions: [
+            { text: 'Male', value: 'male' },
+            { text: 'Female', value: 'female'}
+        ]
+      }
+   })
+   ```
+ui-dropdown(type="search selection" label="Gender" options="{{selectOptions}}" v-ref="dropdown")
+
+
+// Behavior docs
+
+h1 Behavior
+p A dropdown instance has the following methods
+div
+   .ui.button(v-on="click: $.dropdown.$toggle") $toggle()
+   .ui.button(v-on="click: $.dropdown.$hide") $hide()
+   .ui.button(v-on="click: $.dropdown.$show") $show()
+
+
+// Types docs
+
+h1.ui.dividing.header Types
+
+p By specifying the 'type' attribute you can change the type of the Dropdown the same way
+   | you would normally do it in Semantic-UI by using class names
+p 'type' is simply a list of classes which are appended to the dropdown
+
+h4 Dropdown (default)
+ui-dropdown(label="Gender" options="{{selectOptions}}")
+:markdown
+   ```html
+   <ui-dropdown label="Gender" options="selectOptions"></ui-dropdown>
+   ```
+.ui.divider
+
+h4 Selection
+ui-dropdown(type="selection" label="Gender" options="{{selectOptions}}")
+:markdown
+   ```html
+   <ui-dropdown type="selection" label="Gender" options="selectOptions"></ui-dropdown>
+   ```
+.ui.divider
+
+h4 Search Selection
+ui-dropdown(type="search selection" label="Gender" options="{{selectOptions}}")
+:markdown
+   ```html
+   <ui-dropdown type="search selection" label="Gender" options="selectOptions"></ui-dropdown>
+   ```
+.ui.divider
+
+h4 Inline
+
+span The gender of this user is
+   ui-dropdown(type="inline" label="Gender" options="{{selectOptions}}")
+
+:markdown
+   ```html
+   <span> The gender of this user is
+      <ui-dropdown type="inline" label="Gender" options="selectOptions"></ui-dropdown>
+   </span>
+   ```
+.ui.divider
+
+
+// Content
+
+h1.ui.dividing.header= 'Customizing the <content>'

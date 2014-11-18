@@ -1,0 +1,16 @@
+
+h2 Attributes
+
+table.ui.inverted.red.padded.definition.table
+   thead: tr
+      th
+      th Default
+      th Options
+      th Description
+   tbody
+      each attr, name in attributes
+         tr
+            td= name
+            td.positive= attr[0]
+            td= attr[1]
+            td= attr[2]

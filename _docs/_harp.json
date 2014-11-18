@@ -1,0 +1,15 @@
+{
+  "globals": {
+    "title": "Vue-UI documentation",
+    "components": [
+      "accordion",
+      "checkbox",
+      "dropdown",
+      "modal",
+      "popup",
+      "progress",
+      "rating",
+      "sidebar"
+    ]
+  }
+}

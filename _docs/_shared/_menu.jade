@@ -1,0 +1,7 @@
+.ui.large.blue.inverted.vertical.menu
+   each component in components
+      - var name = component.charAt(0).toUpperCase() + component.substring(1)
+      a.item(
+         href="/components/#{component}"
+         class="#{ current.source == component ? 'active' : ''}"
+      )= name
