@@ -1,5 +1,9 @@
 
-!= partial("_usage")
-!= partial("_behavior")
-!= partial("_attributes")
-!= partial("_content")
+include ../_shared/_mixins
+
+include _usage
+include _behavior
+include _attributes
+
+- var component = current.path[1]
++content(component)

@@ -1,5 +1,8 @@
 
+include ../_shared/_mixins
+
 != partial("_usage")
 != partial("_behavior")
 != partial("_attributes")
-!= partial("_content")
+
++content(current.path[1])

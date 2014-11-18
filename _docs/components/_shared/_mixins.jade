@@ -1,0 +1,11 @@
+
+mixin content(component)
+   h1.ui.dividing.header= 'Customizing the <content>'
+
+   - var templatePath = 'http://gist-it.appspot.com/https://github.com/vueui/vue-ui/blob/master/components/' + component + '/' + component + '.jade?footer=minimal'
+
+   :markdown
+      Here is the Jade template of this component. The **content** blocks can be replaced using a selector.
+      **Important**: Make sure you include all the Vue.js directives as in the original template for the Component to work.
+
+   script(src="#{ templatePath }")

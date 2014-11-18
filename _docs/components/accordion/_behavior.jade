@@ -1,0 +1,15 @@
+
+h1 Behavior
+p An accordion instance has the following methods
+
+mixin behavior(method)
+    .ui.button(v-on="click: $.accordion['#{ method }'](index)") #{ method }(index)
+
+.ui.labeled.input
+    .ui.label index
+    input(type="text" v-model="index" number)
+
+.ui.buttons
+    +behavior('$toggle')
+    +behavior('$open')
+    +behavior('$close')

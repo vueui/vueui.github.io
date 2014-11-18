@@ -1,0 +1,24 @@
+
+h1 Usage
+:markdown
+    ```html
+    <ui-accordion class="fluid styled" v-with="sections: sections">
+        <a class="content">{{content}}</a>
+    </ui-accordion>
+    ```
+    ```js
+    // Assuming the ui-accordion above is a child of 'app'
+    var app = new Vue({
+        data: {
+            sections: [{
+                title: 'Google',
+                content: 'http://google.com'
+            }, {
+                title: 'Facebook',
+                content: 'http://facebook.com'
+            }]
+        }
+    })
+    ```
+ui-accordion(class="fluid styled" v-with="sections: sections" v-ref="accordion")
+    a(class="content" href="{{* content}}") {{content}}
