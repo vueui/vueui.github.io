@@ -1,0 +1,56 @@
+
+// Attributes docs
+h1.ui.dividing.header Attributes
+
+h2: strong type {String}
+
+p Change the type of the Dropdown the same way you would normally do it in Semantic-UI by using class names
+p 'type' is simply a list of classes which are appended to the dropdown
+
+h4 Dropdown (default)
+ui-dropdown(label="Gender" options="{{selectOptions}}")
+:markdown
+    ```html
+    <ui-dropdown label="Gender" options="selectOptions"></ui-dropdown>
+    ```
+.ui.divider
+
+h4 Selection
+ui-dropdown(type="selection" label="Gender" options="{{selectOptions}}")
+:markdown
+    ```html
+    <ui-dropdown type="selection" label="Gender" options="selectOptions"></ui-dropdown>
+    ```
+.ui.divider
+
+h4 Search Selection
+ui-dropdown(type="search selection" label="Gender" options="{{selectOptions}}")
+:markdown
+    ```html
+    <ui-dropdown type="search selection" label="Gender" options="selectOptions"></ui-dropdown>
+    ```
+.ui.divider
+
+h4 Inline
+span The gender of this user is
+    ui-dropdown(type="inline" label="Gender" options="{{selectOptions}}")
+
+:markdown
+    ```html
+    <span> The gender of this user is
+       <ui-dropdown type="inline" label="Gender" options="selectOptions"></ui-dropdown>
+    </span>
+    ```
+.ui.divider
+
+h2: strong label | {String}
+p A label which appears on the dropdown when no option is selected
+
+h2: strong on | {String} Default: 'click'
+p Event used to trigger dropdown 'hover' or 'click'
+
+h2: strong options | {Array}
+p options should be a keypath/expression that points to an Array to use as the dropdown options
+
+h2: strong name | {String}
+p= 'sets the name of the <input /> inside the dropdown'

@@ -8,13 +8,13 @@ html
     title= title
 
     link(rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700")
-    link(rel="stylesheet" href="../assets/semantic.min.css")
-    link(rel="stylesheet" href="../assets/semantic-modules.min.css")
-    link(rel="stylesheet" href="../assets/railscasts.css")
+    link(rel="stylesheet" href="../../assets/semantic.min.css")
+    link(rel="stylesheet" href="../../assets/semantic-modules.min.css")
+    link(rel="stylesheet" href="../../assets/railscasts.css")
 
     script(src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js")
-    script(src="../assets/semantic-modules.min.js")
-    script(src="../assets/highlight.pack.js")
+    script(src="../../assets/semantic-modules.min.js")
+    script(src="../../assets/highlight.pack.js")
     script hljs.initHighlightingOnLoad();
 
   body#app.ui.page.grid
@@ -24,8 +24,8 @@ html
 
       .fourteen.wide.column
         .ui.raised.segment
-          h1= 'ui-' + current.source
+          h1= 'ui-' + current.path[1]
           != yield
 
-    script(src="./examples/main.js")
-    script(src="./examples/#{ current.source }.js")
+    script(src="../examples/main.js")
+    script(src="../examples/#{ current.path[1] }.js")

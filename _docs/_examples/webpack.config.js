@@ -15,7 +15,7 @@ module.exports = {
     },
 
     output: {
-        path: path.join(__dirname, '../../components/examples'),
+        path: path.join(__dirname, '../components/examples'),
         filename: "[name].js"
     },
 

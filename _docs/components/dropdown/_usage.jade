@@ -1,0 +1,21 @@
+
+// Usage docs
+h1 Usage
+:markdown
+    ```html
+    <ui-dropdown
+          type="search selection"
+          label="Gender"
+          options="selectOptions"></ui-dropdown>
+    ```
+    ```js
+    new Vue({
+       data: {
+          selectOptions: [
+             { text: 'Male', value: 'male' },
+             { text: 'Female', value: 'female'}
+         ]
+       }
+    })
+    ```
+ui-dropdown(type="search selection" label="Gender" options="{{selectOptions}}" v-ref="dropdown")
