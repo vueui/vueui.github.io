@@ -1,0 +1,14 @@
+
+h1 Usage
+p ui-popup needs to be placed as an immedate sibbling of the element on which it will be activated.
+
+:markdown
+    ```html
+    <i class="circular heart icon link"></i>
+    <ui-popup content="Just a heart." position="right center" variation="inverted"></ui-popup>
+    ```
+
+.ui.center.aligned.segment
+    | Heart me!
+    i.circular.heart.icon.link
+    ui-popup(content="Just a heart." position="right center" variation="inverted" v-ref="popup")

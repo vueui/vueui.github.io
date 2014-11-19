@@ -1,0 +1,26 @@
+
+h1.ui.dividing.header Attributes
+
+h2: strong title {String}
+p The title of the popup. If not specified, it will not take any place in the DOM(ie display="none")
+
+h2: strong content {String}
+:markdown
+    The content of the popup as a string. If you need to display a custom block of HTML, you can always do the following
+    ```html
+    <ui-popup attributes...>
+        <div class="content"> Your HTML here ... </div>
+    </ui-popup>
+    ```
+
+h2: strong on {String} Default: 'hover'
+p The event on which the popup will appear. Can be 'click' or 'hover'
+
+h2: strong position {String} Default: 'top right'
+p The position where the popup will be displayed on the activating element.
+    | Possible options: 'top left', 'top center', 'top right', 'right center', 'bottom right', 'bottom center', 'bottom left', 'left center'
+
+h2: strong variation {String}
+p There is different variations of a popup. You can see all the options here:
+:markdown
+    [Variations](http://beta.semantic-ui.com/modules/popup.html#basic)
