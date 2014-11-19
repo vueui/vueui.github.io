@@ -1,0 +1,17 @@
+
+h1.ui.dividing.header Attributes
+
+h2: strong type {String} Default: 'standard'
+p The type of the modal can be 'standard' or 'basic'
+
+h2: strong title {String}
+p The title appears at the top of the modal. The default value is an empty string.
+
+h2: strong size {String}
+p The size of the modal can be 'fullscreen', 'small' or 'large'
+:markdown
+    ```html
+    <ui-modal title="Confirm publication" size="fullscreen">
+        <div class="content">Are you sure you want to publish this document?</div>
+    </ui-modal>
+    ```

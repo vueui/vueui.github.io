@@ -9,3 +9,9 @@ mixin content(component)
       **Important**: Make sure you include all the Vue.js directives as in the original template for the Component to work.
 
    script(src="#{ templatePath }")
+
+
+mixin behaviors(module, methods)
+   .ui.buttons
+   each method in methods
+      .ui.button(v-on="click: $['#{ module }']['#{ method }']") #{ method }()

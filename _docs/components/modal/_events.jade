@@ -1,0 +1,16 @@
+
+h1.ui.dividing.header Events
+
+:markdown
+   A ui-modal instance emits two events:
+
+   - **'approved'** when the ***positive action button*** is clicked
+   - **'denied'** when the ***negative action button*** is clicked
+
+   You can listen for these events in the following way:
+
+   ```js
+   var modal = new Modal({ ... });
+   modal.$on('approved', function(){ })
+   modal.$on('denied', function(){ })
+   ```
