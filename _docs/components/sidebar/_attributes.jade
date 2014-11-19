@@ -1,0 +1,30 @@
+
+h1.ui.dividing.header Attributes
+
+#attributes
+    h2: strong transition {String} Default: 'push'
+    :markdown
+        A transition name. Possible options can be seen at
+        [sidebar transitions](http://beta.semantic-ui.com/modules/sidebar.html#transitions)
+
+    h2: strong direction {String} Default: 'left'
+    p A sidebar can appear on different sides of the page. Possible options are 'left', 'right', 'top', 'bottom'
+
+    h2: strong dimPage {Boolean} Default: false
+    p Whether the page should be dimmed when the sidebar appears. To turn this option on
+    | you can either pass a data value of true for 'dimPage' or set it as an attribute on ui-sidebar
+    :markdown
+        ```html
+        <ui-sidebar position="right" dimPage>
+            <div class="menu"> ... </div>
+        </ui-sidebar>
+        ```
+
+    h2: strong class {String}
+    p A sidebar can be anything you want it to be. You just need to pass in the extra classes, for example:
+    :markdown
+        ```html
+        <ui-sidebar class="raised segment">
+            <content></content>
+        </ui-sidebar>
+        ```
