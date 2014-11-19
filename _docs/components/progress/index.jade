@@ -1,8 +1,9 @@
 
 include ../_shared/_mixins
 
-!= partial("_usage")
-!= partial("_behavior")
-!= partial("_attributes")
+include _usage
+include _behavior
+include _attributes
+include _events
 
 +content(current.path[1])

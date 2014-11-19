@@ -1,0 +1,11 @@
+
+h1.ui.dividing.header Behavior
+
+#example-behavior
+    .ui.labeled.input
+        .ui.label increment by
+        input(type="text" v-model="value" number)
+
+    .ui.buttons
+        .ui.button(v-on="click: increment") $increment(value)
+        .ui.button(v-on="click: decrement") $decrement(value)

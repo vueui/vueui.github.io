@@ -1,0 +1,28 @@
+
+h1.ui.dividing.header Attributes
+
+h2: strong value {Number} Default: 0
+p The starting value of the progress.
+
+h2: strong total {Number} Default: 100
+p The maximum value that the progress can run up to. Default is 100, ie 100%
+
+#class-examples
+    h2: strong class {String}
+    :markdown
+        Use this attribute to specify different variations by adding one or more classes from here: [variations](http://beta.semantic-ui.com/modules/progress.html#inverted)
+
+    h4: strong Color
+    :markdown
+        ```html
+        <ui-progress class="green" value="20"></ui-progress>
+        ```
+    ui-progress(class="green" value="20")
+
+    h4: strong Attached
+    :markdown
+        ```html
+        <ui-progress class="attached blue" value="50"></ui-progress>
+        ```
+    ui-progress(class="attached blue" value="50"): div ''
+    .ui.attached.segment A segment with the progress bar attached to the top.

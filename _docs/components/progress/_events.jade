@@ -1,0 +1,12 @@
+
+h1.ui.dividing.header Events
+
+:markdown
+   A ui-progress instance emits a **'completed'** event, which you can listen to in the following way:
+   ```js
+   var transcoding = new Progress({ ... });
+   transcoding.$on('completed', function(){
+      // Set the 'status' depending on other logic
+      transcoding.status = 'error';
+   })
+   ```

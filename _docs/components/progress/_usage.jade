@@ -1,0 +1,16 @@
+
+h1 Usage
+:markdown
+    ```html
+    <ui-progress class="inverted indicating" value="10" total="20">
+        <div class="label">
+            <span v-if="isActive">Adding {{value}} of {{total}} photos</span>
+            <span v-if="!isActive">Photos uploaded.</span>
+        </div>
+    </ui-progress>
+    ```
+
+#progress: ui-progress(class="inverted indicating" value="10" total="20" v-ref="progress")
+    .label
+        span(v-if="isActive") Adding {{value}} of {{total}} photos
+        span(v-if="!isActive") All photos were uploaded.
