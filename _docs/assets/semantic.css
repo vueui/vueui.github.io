@@ -1,114 +1,3 @@
-@import 'http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic';
-
-/*
- * # Semantic UI
- * https://github.com/Semantic-Org/Semantic-UI
- * http://beta.semantic-ui.com/
- *
- * Copyright 2014 Contributors
- * Released under the MIT license
- * http://opensource.org/licenses/MIT
- *
- */
-
-/*******************************
-             Page
-*******************************/
-
-/* UI requires Border-Box */
-
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-}
-
-html {
-  font-size: 14px;
-}
-
-body {
-  margin: 0px;
-  padding: 0px;
-  min-width: 278px;
-  background: #f7f7f7;
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  line-height: 1.33;
-  color: rgba(0, 0, 0, 0.8);
-  font-smoothing: antialiased;
-}
-
-/*******************************
-             Text
-*******************************/
-
-h1,
-h2,
-h3,
-h4,
-h5 {
-  margin: 1em 0em 1rem;
-  padding: 0em;
-}
-
-p {
-  margin: 0em 0em 1em;
-}
-
-p:first-child {
-  margin-top: 0em;
-}
-
-p:last-child {
-  margin-bottom: 0em;
-}
-
-/*-------------------
-        Links
---------------------*/
-
-a {
-  color: #009fda;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #00b2f3;
-}
-
-/*******************************
-          Highlighting
-*******************************/
-
-::-webkit-selection {
-  background-color: rgba(255, 255, 160, 0.4);
-  color: rgba(0, 0, 0, 0.8);
-}
-
-::-moz-selection {
-  background-color: rgba(255, 255, 160, 0.4);
-  color: rgba(0, 0, 0, 0.8);
-}
-
-::selection {
-  background-color: rgba(255, 255, 160, 0.4);
-  color: rgba(0, 0, 0, 0.8);
-}
-
-/*******************************
-        Global Overrides
-*******************************/
-
-/*******************************
-         Site Overrides
-*******************************/
-
 /*
  * # Semantic UI
  * https://github.com/Semantic-Org/Semantic-UI
@@ -140,7 +29,6 @@ input[type="search"],
 input[type="password"] {
   -webkit-appearance: none;
   -moz-appearance: none;
-  /* mobile firefox too! */
 }
 
 /*******************************
@@ -167,7 +55,6 @@ html {
   -ms-text-size-adjust: 100%;
   /* 2 */
   -webkit-text-size-adjust: 100%;
-  /* 2 */
 }
 
 /**
@@ -214,7 +101,6 @@ video {
   display: inline-block;
   /* 1 */
   vertical-align: baseline;
-  /* 2 */
 }
 
 /**
@@ -416,7 +302,6 @@ textarea {
   font: inherit;
   /* 2 */
   margin: 0;
-  /* 3 */
 }
 
 /**
@@ -454,7 +339,6 @@ input[type="submit"] {
   -webkit-appearance: button;
   /* 2 */
   cursor: pointer;
-  /* 3 */
 }
 
 /**
@@ -498,7 +382,6 @@ input[type="radio"] {
   box-sizing: border-box;
   /* 1 */
   padding: 0;
-  /* 2 */
 }
 
 /**
@@ -555,7 +438,6 @@ legend {
   border: 0;
   /* 1 */
   padding: 0;
-  /* 2 */
 }
 
 /**
@@ -591,6 +473,144 @@ td,
 th {
   padding: 0;
 }
+
+/*******************************
+         Site Overrides
+*******************************/
+
+/*
+ * # Semantic UI
+ * https://github.com/Semantic-Org/Semantic-UI
+ * http://beta.semantic-ui.com/
+ *
+ * Copyright 2014 Contributors
+ * Released under the MIT license
+ * http://opensource.org/licenses/MIT
+ *
+ */
+
+/*******************************
+             Page
+*******************************/
+
+/* UI requires Border-Box */
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  min-width: 278px;
+  background: #f7f7f7;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.33;
+  color: rgba(0, 0, 0, 0.8);
+  font-smoothing: antialiased;
+}
+
+/*******************************
+             Headers
+*******************************/
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  line-height: 1.33em;
+  margin: -webkit-calc(2rem -  0.165em ) 0em 1rem;
+  margin: calc(2rem -  0.165em ) 0em 1rem;
+  font-weight: bold;
+  padding: 0em;
+}
+
+h1 {
+  min-height: 1rem;
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.714rem;
+}
+
+h3 {
+  font-size: 1.28rem;
+}
+
+h4 {
+  font-size: 1.071rem;
+}
+
+h5 {
+  font-size: 1rem;
+}
+
+/*******************************
+             Text
+*******************************/
+
+p {
+  margin: 0em 0em 1em;
+  line-height: 1.33;
+}
+
+p:first-child {
+  margin-top: 0em;
+}
+
+p:last-child {
+  margin-bottom: 0em;
+}
+
+/*-------------------
+        Links
+--------------------*/
+
+a {
+  color: #009fda;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #00b2f3;
+}
+
+/*******************************
+          Highlighting
+*******************************/
+
+::-webkit-selection {
+  background-color: rgba(255, 255, 160, 0.4);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+::-moz-selection {
+  background-color: rgba(255, 255, 160, 0.4);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+::selection {
+  background-color: rgba(255, 255, 160, 0.4);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/*******************************
+        Global Overrides
+*******************************/
 
 /*******************************
          Site Overrides
@@ -1893,7 +1913,7 @@ th {
 
 .ui.black.buttons .button:hover,
 .ui.black.button:hover {
-  background-color: #222425;
+  background-color: #1b1c1d;
   color: #ffffff;
   text-shadow: none;
 }
@@ -1925,8 +1945,8 @@ th {
 .ui.basic.black.buttons .button:hover,
 .ui.basic.black.button:hover {
   background: transparent !important;
-  box-shadow: 0px 0px 0px 2px #222425 inset !important;
-  color: #222425 !important;
+  box-shadow: 0px 0px 0px 2px #1b1c1d inset !important;
+  color: #1b1c1d !important;
 }
 
 .ui.basic.black.buttons .button:active,
@@ -3778,7 +3798,7 @@ h5.ui.header {
 }
 
 a.ui.black.header:hover {
-  color: #222425 !important;
+  color: #1b1c1d !important;
 }
 
 .ui.blue.header {
@@ -4283,7 +4303,7 @@ i.disabled.icon {
 
 i.link.icon {
   cursor: pointer;
-  opacity: 1;
+  opacity: 0.8;
   -webkit-transition: opacity 0.2s ease;
   transition: opacity 0.2s ease;
 }
@@ -8109,14 +8129,14 @@ a.ui.label:hover:before {
 
 a.ui.black.labels .label:hover,
 a.ui.black.label:hover {
-  background-color: #222425 !important;
-  border-color: #222425 !important;
+  background-color: #1b1c1d !important;
+  border-color: #1b1c1d !important;
 }
 
 .ui.labels a.black.label:hover:before,
 .ui.black.labels a.label:hover:before,
 a.ui.black.label:hover:before {
-  background-color: #222425 !important;
+  background-color: #1b1c1d !important;
 }
 
 .ui.black.corner.label,
@@ -9161,19 +9181,13 @@ ol.ui.list ol,
        Animated
 --------------------*/
 
-.ui.animated.list .list > .item,
 .ui.animated.list > .item {
   -webkit-transition: 0.2s color ease, 0.2s padding-left ease, 0.2s background-color ease;
   transition: 0.2s color ease, 0.2s padding-left ease, 0.2s background-color ease;
 }
 
-.ui.animated.list:not(.horizontal) .list > .item:hover,
 .ui.animated.list:not(.horizontal) > .item:hover {
   padding-left: 1em;
-}
-
-.ui.animated.list:not(.horizontal) .item:hover .list > .item:hover {
-  padding-left: 0.5em;
 }
 
 /*-------------------
@@ -9235,11 +9249,6 @@ ul.ui.horizontal.bulleted.list,
 ul.ui.horizontal.bulleted.list li,
 .ui.horizontal.bulleted.list > .item {
   margin-left: 1.5rem;
-}
-
-ul.ui.horizontal.bulleted.list li:before,
-.ui.horizontal.bulleted.list > .item:before {
-  left: -1.1rem;
 }
 
 ul.ui.horizontal.bulleted.list li:first-child,
@@ -9559,42 +9568,82 @@ ol.ui.horizontal.list li:before,
 
 .ui.mini.list .list > .item,
 .ui.mini.list > .item {
-  font-size: 0.7rem;
+  font-size: 0.7142em;
 }
 
 .ui.tiny.list .list > .item,
 .ui.tiny.list > .item {
-  font-size: 0.8rem;
+  font-size: 0.8571em;
 }
 
 .ui.small.list .list > .item,
 .ui.small.list > .item {
-  font-size: 0.9rem;
+  font-size: 0.9285em;
 }
 
 .ui.list .list > .item,
 .ui.list > .item {
-  font-size: 1rem;
+  font-size: 1em;
 }
 
 .ui.large.list .list > .item,
 .ui.large.list > .item {
-  font-size: 1.1rem;
+  font-size: 1.1428em;
 }
 
 .ui.big.list .list > .item,
 .ui.big.list > .item {
-  font-size: 1.2rem;
+  font-size: 1.2857em;
 }
 
 .ui.huge.list .list > .item,
 .ui.huge.list > .item {
-  font-size: 1.3rem;
+  font-size: 1.4285em;
 }
 
 .ui.massive.list .list > .item,
 .ui.massive.list > .item {
-  font-size: 1.5rem;
+  font-size: 1.7142em;
+}
+
+.ui.mini.horizontal.list .list > .item,
+.ui.mini.horizontal.list > .item {
+  font-size: 0.7142rem;
+}
+
+.ui.tiny.horizontal.list .list > .item,
+.ui.tiny.horizontal.list > .item {
+  font-size: 0.8571rem;
+}
+
+.ui.small.horizontal.list .list > .item,
+.ui.small.horizontal.list > .item {
+  font-size: 0.9285rem;
+}
+
+.ui.horizontal.list .list > .item,
+.ui.horizontal.list > .item {
+  font-size: 1rem;
+}
+
+.ui.large.horizontal.list .list > .item,
+.ui.large.horizontal.list > .item {
+  font-size: 1.1428rem;
+}
+
+.ui.big.horizontal.list .list > .item,
+.ui.big.horizontal.list > .item {
+  font-size: 1.2857rem;
+}
+
+.ui.huge.horizontal.list .list > .item,
+.ui.huge.horizontal.list > .item {
+  font-size: 1.4285rem;
+}
+
+.ui.massive.horizontal.list .list > .item,
+.ui.massive.horizontal.list > .item {
+  font-size: 1.7142rem;
 }
 
 /*******************************
@@ -11365,7 +11414,6 @@ ol.ui.horizontal.list li:before,
 .ui.ordered.steps .step.completed:before {
   font-family: 'Step';
   content: '\e800';
-  /* '' */
 }
 
 /*******************************
@@ -11570,6 +11618,7 @@ ol.ui.horizontal.list li:before,
 
 .ui.grid > .column:not(.row),
 .ui.grid > .row > .column {
+  position: relative;
   display: inline-block;
   text-align: left;
   font-size: 1rem;
@@ -11589,6 +11638,7 @@ ol.ui.horizontal.list li:before,
 --------------------*/
 
 .ui.grid > .row {
+  position: relative;
   display: block;
   width: auto !important;
   padding: 0rem;
@@ -15067,23 +15117,23 @@ ol.ui.horizontal.list li:before,
 ---------------*/
 
 .ui.small.message {
-  font-size: 0.9285rem;
+  font-size: 0.9285em;
 }
 
 .ui.message {
-  font-size: 1rem;
+  font-size: 1em;
 }
 
 .ui.large.message {
-  font-size: 1.1428rem;
+  font-size: 1.1428em;
 }
 
 .ui.huge.message {
-  font-size: 1.4285rem;
+  font-size: 1.4285em;
 }
 
 .ui.massive.message {
-  font-size: 1.7142rem;
+  font-size: 1.7142em;
 }
 
 /*******************************
@@ -17222,448 +17272,6 @@ a.ui.card:hover,
  */
 
 /*******************************
-           Statistic
-*******************************/
-
-/* Standalone */
-
-.ui.statistic {
-  display: inline-block;
-  margin: 1em 0em;
-  max-width: 175px;
-}
-
-.ui.statistic + .ui.statistic {
-  margin: 0em 0em 0em 1em;
-}
-
-.ui.statistic:first-child {
-  margin-top: 0em;
-}
-
-.ui.statistic:last-child {
-  margin-bottom: 0em;
-}
-
-/* Grouped */
-
-.ui.statistics > .statistic {
-  display: block;
-  float: left;
-  margin: 0em 1em 2em;
-  max-width: 175px;
-}
-
-/*******************************
-            Group
-*******************************/
-
-.ui.statistics {
-  display: block;
-  margin: 1em -1em;
-}
-
-/* Clearing */
-
-.ui.statistics:after {
-  display: block;
-  content: ' ';
-  height: 0px;
-  clear: both;
-  overflow: hidden;
-  visibility: hidden;
-}
-
-.ui.statistics:first-child {
-  margin-top: 0em;
-}
-
-.ui.statistics:last-child {
-  margin-bottom: 0em;
-}
-
-/*******************************
-            Content
-*******************************/
-
-/*--------------
-      Value
----------------*/
-
-.ui.statistics .statistic > .value,
-.ui.statistic > .value {
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-size: 4rem;
-  font-weight: normal;
-  line-height: 1em;
-  color: #1b1c1d;
-  text-transform: uppercase;
-  text-align: center;
-}
-
-/*--------------
-     Label
----------------*/
-
-.ui.statistics .statistic > .label,
-.ui.statistic > .label {
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-size: 1rem;
-  font-weight: normal;
-  color: rgba(0, 0, 0, 0.4);
-  text-transform: none;
-  text-align: center;
-}
-
-/* Top Label */
-
-.ui.statistics .statistic > .label ~ .value,
-.ui.statistic > .label ~ .value {
-  margin-top: 0rem;
-}
-
-/* Bottom Label */
-
-.ui.statistics .statistic > .value ~ .label,
-.ui.statistic > .value ~ .label {
-  margin-top: 0.25rem;
-}
-
-/*******************************
-             Types
-*******************************/
-
-/*--------------
-   Icon Value
----------------*/
-
-.ui.statistics .statistic > .value .icon,
-.ui.statistic > .value .icon {
-  opacity: 1;
-  width: auto;
-}
-
-/*--------------
-   Text Value
----------------*/
-
-.ui.statistics .statistic > .text.value,
-.ui.statistic > .text.value {
-  line-height: 1em;
-  min-height: 2em;
-  text-align: center;
-}
-
-.ui.statistics .statistic > .text.value + .label,
-.ui.statistic > .text.value + .label {
-  text-align: center;
-}
-
-/*--------------
-   Image Value
----------------*/
-
-.ui.statistics .statistic > .value img,
-.ui.statistic > .value img {
-  max-height: 3rem;
-  vertical-align: baseline;
-}
-
-/*******************************
-            Variations
-*******************************/
-
-/*--------------
-   Horizontal
----------------*/
-
-.ui.horizontal.statistics,
-.ui.horizontal.statistic {
-  display: block;
-  margin: 0em;
-  max-width: 9999px;
-}
-
-.ui.horizontal.statistics .statistic {
-  float: none;
-  margin: 1em 0em;
-  max-width: 9999px;
-}
-
-.ui.horizontal.statistic > .text.value,
-.ui.horizontal.statistics > .statistic > .text.value {
-  min-height: 0em !important;
-}
-
-.ui.horizontal.statistics .statistic > .value,
-.ui.horizontal.statistic > .value {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.ui.horizontal.statistics .statistic > .label,
-.ui.horizontal.statistic > .label {
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0em 0em 0em 0.75em;
-}
-
-/*--------------
-     Colors
----------------*/
-
-.ui.blue.statistics .statistic > .value,
-.ui.statistics .blue.statistic > .value,
-.ui.blue.statistic > .value {
-  color: #3b83c0;
-}
-
-.ui.green.statistics .statistic > .value,
-.ui.statistics .green.statistic > .value,
-.ui.green.statistic > .value {
-  color: #5bbd72;
-}
-
-.ui.orange.statistics .statistic > .value,
-.ui.statistics .orange.statistic > .value,
-.ui.orange.statistic > .value {
-  color: #e07b53;
-}
-
-.ui.pink.statistics .statistic > .value,
-.ui.statistics .pink.statistic > .value,
-.ui.pink.statistic > .value {
-  color: #d9499a;
-}
-
-.ui.purple.statistics .statistic > .value,
-.ui.statistics .purple.statistic > .value,
-.ui.purple.statistic > .value {
-  color: #564f8a;
-}
-
-.ui.red.statistics .statistic > .value,
-.ui.statistics .red.statistic > .value,
-.ui.red.statistic > .value {
-  color: #d95c5c;
-}
-
-.ui.teal.statistics .statistic > .value,
-.ui.statistics .teal.statistic > .value,
-.ui.teal.statistic > .value {
-  color: #00b5ad;
-}
-
-.ui.yellow.statistics .statistic > .value,
-.ui.statistics .yellow.statistic > .value,
-.ui.yellow.statistic > .value {
-  color: #f2c61f;
-}
-
-/*--------------
-    Floated
----------------*/
-
-.ui.left.floated.statistic {
-  float: left;
-  margin: 0em 2em 1em 0em;
-}
-
-.ui.right.floated.statistic {
-  float: right;
-  margin: 0em 0em 1em 2em;
-}
-
-.ui.floated.statistic:last-child {
-  margin-bottom: 0em;
-}
-
-/*--------------
-    Inverted
----------------*/
-
-.ui.inverted.statistic .value {
-  color: #ffffff;
-}
-
-.ui.inverted.statistic .label {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.ui.inverted.blue.statistics .statistic > .value,
-.ui.statistics .inverted.blue.statistic > .value,
-.ui.inverted.blue.statistic > .value {
-  color: #54c8ff;
-}
-
-.ui.inverted.green.statistics .statistic > .value,
-.ui.statistics .inverted.green.statistic > .value,
-.ui.inverted.green.statistic > .value {
-  color: #2ecc40;
-}
-
-.ui.inverted.orange.statistics .statistic > .value,
-.ui.statistics .inverted.orange.statistic > .value,
-.ui.inverted.orange.statistic > .value {
-  color: #ff851b;
-}
-
-.ui.inverted.pink.statistics .statistic > .value,
-.ui.statistics .inverted.pink.statistic > .value,
-.ui.inverted.pink.statistic > .value {
-  color: #ff8edf;
-}
-
-.ui.inverted.purple.statistics .statistic > .value,
-.ui.statistics .inverted.purple.statistic > .value,
-.ui.inverted.purple.statistic > .value {
-  color: #cdc6ff;
-}
-
-.ui.inverted.red.statistics .statistic > .value,
-.ui.statistics .inverted.red.statistic > .value,
-.ui.inverted.red.statistic > .value {
-  color: #ff695e;
-}
-
-.ui.inverted.teal.statistics .statistic > .value,
-.ui.statistics .inverted.teal.statistic > .value,
-.ui.inverted.teal.statistic > .value {
-  color: #6dffff;
-}
-
-.ui.inverted.yellow.statistics .statistic > .value,
-.ui.statistics .inverted.yellow.statistic > .value,
-.ui.inverted.yellow.statistic > .value {
-  color: #ffe21f;
-}
-
-/*--------------
-     Sizes
----------------*/
-
-/* Mini */
-
-.ui.mini.statistics .statistic > .value,
-.ui.mini.statistic > .value {
-  font-size: 1.5rem;
-}
-
-.ui.mini.horizontal.statistics .statistic > .value,
-.ui.mini.horizontal.statistic > .value {
-  font-size: 1.5rem;
-}
-
-.ui.mini.statistics .statistic > .text.value,
-.ui.mini.statistic > .text.value {
-  font-size: 1rem;
-}
-
-/* Tiny */
-
-.ui.tiny.statistics .statistic > .value,
-.ui.tiny.statistic > .value {
-  font-size: 2rem;
-}
-
-.ui.tiny.horizontal.statistics .statistic > .value,
-.ui.tiny.horizontal.statistic > .value {
-  font-size: 2rem;
-}
-
-.ui.tiny.statistics .statistic > .text.value,
-.ui.tiny.statistic > .text.value {
-  font-size: 1rem;
-}
-
-/* Small */
-
-.ui.small.statistics .statistic > .value,
-.ui.small.statistic > .value {
-  font-size: 3rem;
-}
-
-.ui.small.horizontal.statistics .statistic > .value,
-.ui.small.horizontal.statistic > .value {
-  font-size: 2rem;
-}
-
-.ui.small.statistics .statistic > .text.value,
-.ui.small.statistic > .text.value {
-  font-size: 1.5rem;
-}
-
-/* Medium */
-
-.ui.statistics .statistic > .value,
-.ui.statistic > .value {
-  font-size: 4rem;
-}
-
-.ui.horizontal.statistics .statistic > .value,
-.ui.horizontal.statistic > .value {
-  font-size: 3rem;
-}
-
-.ui.statistics .statistic > .text.value,
-.ui.statistic > .text.value {
-  font-size: 2rem;
-}
-
-/* Large */
-
-.ui.large.statistics .statistic > .value,
-.ui.large.statistic > .value {
-  font-size: 5rem;
-}
-
-.ui.large.horizontal.statistics .statistic > .value,
-.ui.large.horizontal.statistic > .value {
-  font-size: 4rem;
-}
-
-.ui.large.statistics .statistic > .text.value,
-.ui.large.statistic > .text.value {
-  font-size: 2.5rem;
-}
-
-/* Huge */
-
-.ui.huge.statistics .statistic > .value,
-.ui.huge.statistic > .value {
-  font-size: 6rem;
-}
-
-.ui.huge.horizontal.statistics .statistic > .value,
-.ui.huge.horizontal.statistic > .value {
-  font-size: 5rem;
-}
-
-.ui.huge.statistics .statistic > .text.value,
-.ui.huge.statistic > .text.value {
-  font-size: 2.5rem;
-}
-
-/*******************************
-         Theme Overrides
-*******************************/
-
-/*******************************
-    User Variable Overrides
-*******************************/
-
-/*
- * # Semantic UI
- * https://github.com/Semantic-Org/Semantic-UI
- * http://beta.semantic-ui.com/
- *
- * Copyright 2014 Contributors
- * Released under the MIT license
- * http://opensource.org/licenses/MIT
- *
- */
-
-/*******************************
          Activity Feed
 *******************************/
 
@@ -18100,10 +17708,6 @@ a.ui.card:hover,
   font-size: 1.2em;
 }
 
-.ui.items > .item > .content > .meta + .description {
-  margin-top: 0.6em;
-}
-
 /*--------------
      Floated
 ---------------*/
@@ -18138,6 +17742,7 @@ a.ui.card:hover,
 ---------------*/
 
 .ui.items > .item > .content > .description {
+  margin-top: 0.6em;
   max-width: 550px;
   font-size: 1em;
   line-height: 1.33;
@@ -18434,6 +18039,454 @@ a.ui.card:hover,
 
 .ui.items > .item {
   font-size: 1em;
+}
+
+/*******************************
+         Theme Overrides
+*******************************/
+
+/*******************************
+    User Variable Overrides
+*******************************/
+
+/*
+ * # Semantic UI
+ * https://github.com/Semantic-Org/Semantic-UI
+ * http://beta.semantic-ui.com/
+ *
+ * Copyright 2014 Contributors
+ * Released under the MIT license
+ * http://opensource.org/licenses/MIT
+ *
+ */
+
+/*******************************
+           Statistic
+*******************************/
+
+/* Standalone */
+
+.ui.statistic {
+  display: inline-block;
+  margin: 1em 0em;
+  max-width: 175px;
+}
+
+.ui.statistic + .ui.statistic {
+  margin: 0em 0em 0em 1em;
+}
+
+.ui.statistic:first-child {
+  margin-top: 0em;
+}
+
+.ui.statistic:last-child {
+  margin-bottom: 0em;
+}
+
+/* Grouped */
+
+.ui.statistics > .statistic {
+  display: block;
+  float: left;
+  margin: 0em 1em 2em;
+  max-width: 175px;
+}
+
+/*******************************
+            Group
+*******************************/
+
+.ui.statistics {
+  display: block;
+  margin: 1em -1em;
+}
+
+/* Clearing */
+
+.ui.statistics:after {
+  display: block;
+  content: ' ';
+  height: 0px;
+  clear: both;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.ui.statistics:first-child {
+  margin-top: 0em;
+}
+
+.ui.statistics:last-child {
+  margin-bottom: 0em;
+}
+
+/*******************************
+            Content
+*******************************/
+
+/*--------------
+      Value
+---------------*/
+
+.ui.statistics .statistic > .value,
+.ui.statistic > .value {
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-size: 4rem;
+  font-weight: normal;
+  line-height: 1em;
+  color: #1b1c1d;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/*--------------
+     Label
+---------------*/
+
+.ui.statistics .statistic > .label,
+.ui.statistic > .label {
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  font-weight: normal;
+  color: rgba(0, 0, 0, 0.4);
+  text-transform: none;
+  text-align: center;
+}
+
+/* Top Label */
+
+.ui.statistics .statistic > .label ~ .value,
+.ui.statistic > .label ~ .value {
+  margin-top: 0rem;
+}
+
+/* Bottom Label */
+
+.ui.statistics .statistic > .value ~ .label,
+.ui.statistic > .value ~ .label {
+  margin-top: 0.25rem;
+}
+
+/*******************************
+             Types
+*******************************/
+
+/*--------------
+   Icon Value
+---------------*/
+
+.ui.statistics .statistic > .value .icon,
+.ui.statistic > .value .icon {
+  opacity: 1;
+  width: auto;
+  margin: 0em;
+}
+
+/*--------------
+   Text Value
+---------------*/
+
+.ui.statistics .statistic > .text.value,
+.ui.statistic > .text.value {
+  line-height: 1em;
+  min-height: 2em;
+  text-align: center;
+}
+
+.ui.statistics .statistic > .text.value + .label,
+.ui.statistic > .text.value + .label {
+  text-align: center;
+}
+
+/*--------------
+   Image Value
+---------------*/
+
+.ui.statistics .statistic > .value img,
+.ui.statistic > .value img {
+  max-height: 3rem;
+  vertical-align: baseline;
+}
+
+/*******************************
+            Variations
+*******************************/
+
+/*--------------
+   Horizontal
+---------------*/
+
+.ui.horizontal.statistics,
+.ui.horizontal.statistic {
+  display: block;
+  margin: 0em;
+  max-width: 9999px;
+}
+
+.ui.horizontal.statistics .statistic {
+  float: none;
+  margin: 1em 0em;
+  max-width: 9999px;
+}
+
+.ui.horizontal.statistic > .text.value,
+.ui.horizontal.statistics > .statistic > .text.value {
+  min-height: 0em !important;
+}
+
+.ui.horizontal.statistics .statistic > .value .icon,
+.ui.horizontal.statistic > .value .icon {
+  width: 1.18em;
+}
+
+.ui.horizontal.statistics .statistic > .value,
+.ui.horizontal.statistic > .value {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.ui.horizontal.statistics .statistic > .label,
+.ui.horizontal.statistic > .label {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0em 0em 0em 0.75em;
+}
+
+/*--------------
+     Colors
+---------------*/
+
+.ui.blue.statistics .statistic > .value,
+.ui.statistics .blue.statistic > .value,
+.ui.blue.statistic > .value {
+  color: #3b83c0;
+}
+
+.ui.green.statistics .statistic > .value,
+.ui.statistics .green.statistic > .value,
+.ui.green.statistic > .value {
+  color: #5bbd72;
+}
+
+.ui.orange.statistics .statistic > .value,
+.ui.statistics .orange.statistic > .value,
+.ui.orange.statistic > .value {
+  color: #e07b53;
+}
+
+.ui.pink.statistics .statistic > .value,
+.ui.statistics .pink.statistic > .value,
+.ui.pink.statistic > .value {
+  color: #d9499a;
+}
+
+.ui.purple.statistics .statistic > .value,
+.ui.statistics .purple.statistic > .value,
+.ui.purple.statistic > .value {
+  color: #564f8a;
+}
+
+.ui.red.statistics .statistic > .value,
+.ui.statistics .red.statistic > .value,
+.ui.red.statistic > .value {
+  color: #d95c5c;
+}
+
+.ui.teal.statistics .statistic > .value,
+.ui.statistics .teal.statistic > .value,
+.ui.teal.statistic > .value {
+  color: #00b5ad;
+}
+
+.ui.yellow.statistics .statistic > .value,
+.ui.statistics .yellow.statistic > .value,
+.ui.yellow.statistic > .value {
+  color: #f2c61f;
+}
+
+/*--------------
+    Floated
+---------------*/
+
+.ui.left.floated.statistic {
+  float: left;
+  margin: 0em 2em 1em 0em;
+}
+
+.ui.right.floated.statistic {
+  float: right;
+  margin: 0em 0em 1em 2em;
+}
+
+.ui.floated.statistic:last-child {
+  margin-bottom: 0em;
+}
+
+/*--------------
+    Inverted
+---------------*/
+
+.ui.inverted.statistic .value {
+  color: #ffffff;
+}
+
+.ui.inverted.statistic .label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ui.inverted.blue.statistics .statistic > .value,
+.ui.statistics .inverted.blue.statistic > .value,
+.ui.inverted.blue.statistic > .value {
+  color: #54c8ff;
+}
+
+.ui.inverted.green.statistics .statistic > .value,
+.ui.statistics .inverted.green.statistic > .value,
+.ui.inverted.green.statistic > .value {
+  color: #2ecc40;
+}
+
+.ui.inverted.orange.statistics .statistic > .value,
+.ui.statistics .inverted.orange.statistic > .value,
+.ui.inverted.orange.statistic > .value {
+  color: #ff851b;
+}
+
+.ui.inverted.pink.statistics .statistic > .value,
+.ui.statistics .inverted.pink.statistic > .value,
+.ui.inverted.pink.statistic > .value {
+  color: #ff8edf;
+}
+
+.ui.inverted.purple.statistics .statistic > .value,
+.ui.statistics .inverted.purple.statistic > .value,
+.ui.inverted.purple.statistic > .value {
+  color: #cdc6ff;
+}
+
+.ui.inverted.red.statistics .statistic > .value,
+.ui.statistics .inverted.red.statistic > .value,
+.ui.inverted.red.statistic > .value {
+  color: #ff695e;
+}
+
+.ui.inverted.teal.statistics .statistic > .value,
+.ui.statistics .inverted.teal.statistic > .value,
+.ui.inverted.teal.statistic > .value {
+  color: #6dffff;
+}
+
+.ui.inverted.yellow.statistics .statistic > .value,
+.ui.statistics .inverted.yellow.statistic > .value,
+.ui.inverted.yellow.statistic > .value {
+  color: #ffe21f;
+}
+
+/*--------------
+     Sizes
+---------------*/
+
+/* Mini */
+
+.ui.mini.statistics .statistic > .value,
+.ui.mini.statistic > .value {
+  font-size: 1.5rem;
+}
+
+.ui.mini.horizontal.statistics .statistic > .value,
+.ui.mini.horizontal.statistic > .value {
+  font-size: 1.5rem;
+}
+
+.ui.mini.statistics .statistic > .text.value,
+.ui.mini.statistic > .text.value {
+  font-size: 1rem;
+}
+
+/* Tiny */
+
+.ui.tiny.statistics .statistic > .value,
+.ui.tiny.statistic > .value {
+  font-size: 2rem;
+}
+
+.ui.tiny.horizontal.statistics .statistic > .value,
+.ui.tiny.horizontal.statistic > .value {
+  font-size: 2rem;
+}
+
+.ui.tiny.statistics .statistic > .text.value,
+.ui.tiny.statistic > .text.value {
+  font-size: 1rem;
+}
+
+/* Small */
+
+.ui.small.statistics .statistic > .value,
+.ui.small.statistic > .value {
+  font-size: 3rem;
+}
+
+.ui.small.horizontal.statistics .statistic > .value,
+.ui.small.horizontal.statistic > .value {
+  font-size: 2rem;
+}
+
+.ui.small.statistics .statistic > .text.value,
+.ui.small.statistic > .text.value {
+  font-size: 1.5rem;
+}
+
+/* Medium */
+
+.ui.statistics .statistic > .value,
+.ui.statistic > .value {
+  font-size: 4rem;
+}
+
+.ui.horizontal.statistics .statistic > .value,
+.ui.horizontal.statistic > .value {
+  font-size: 3rem;
+}
+
+.ui.statistics .statistic > .text.value,
+.ui.statistic > .text.value {
+  font-size: 2rem;
+}
+
+/* Large */
+
+.ui.large.statistics .statistic > .value,
+.ui.large.statistic > .value {
+  font-size: 5rem;
+}
+
+.ui.large.horizontal.statistics .statistic > .value,
+.ui.large.horizontal.statistic > .value {
+  font-size: 4rem;
+}
+
+.ui.large.statistics .statistic > .text.value,
+.ui.large.statistic > .text.value {
+  font-size: 2.5rem;
+}
+
+/* Huge */
+
+.ui.huge.statistics .statistic > .value,
+.ui.huge.statistic > .value {
+  font-size: 6rem;
+}
+
+.ui.huge.horizontal.statistics .statistic > .value,
+.ui.huge.horizontal.statistic > .value {
+  font-size: 5rem;
+}
+
+.ui.huge.statistics .statistic > .text.value,
+.ui.huge.statistic > .text.value {
+  font-size: 2.5rem;
 }
 
 /*******************************

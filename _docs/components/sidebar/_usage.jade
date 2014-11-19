@@ -4,7 +4,7 @@ h1.ui.dividing.header Usage
 #usage
     :markdown
         ```html
-        <ui-sidebar class="raised vertical inverted labeled icon menu">
+        <ui-sidebar class="vertical inverted labeled icon menu">
             <a class="item">
                 <i class="home icon"></i>
                 Home
@@ -16,8 +16,8 @@ h1.ui.dividing.header Usage
         </ui-sidebar>
         ```
     - var items = [ 'Home', 'Smile' ]
-    ui-sidebar(class="raised vertical inverted labeled icon menu" v-ref="sidebar")
-    each item in items
-        a.item
-            i.icon(class="#{ item.toLowerCase() }")
-            | #{item}
+    ui-sidebar(class="vertical inverted labeled icon menu" v-ref="sidebar")
+        each item in items
+            a.item
+                i.icon(class="#{ item.toLowerCase() }")
+                | #{item}
