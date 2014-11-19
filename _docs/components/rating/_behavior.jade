@@ -1,0 +1,9 @@
+
+h1.ui.dividing.header Behavior
+
+#behavior
+    .ui.labeled.input
+        .ui.label rating
+        input(type="text" v-model="rating" number)
+
+    .ui.button(v-on="click: setRating") $setRating(rating)

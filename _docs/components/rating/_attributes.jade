@@ -1,0 +1,26 @@
+
+h1.ui.dividing.header Attributes
+
+#attributes
+    h2: strong rating {Number} Default: 0
+    p Initialize ui-rating with a rate.
+
+    h2: strong max {Number} Default: 5
+    p Maximum possible rate.
+
+    h2: strong class {String}
+    p Change the type ('heart' or 'star') and size ('mini', 'tiny', 'small', 'large', 'huge', 'massive') of the ui-rating component.
+
+    h4: strong Heart
+    :markdown
+        ```html
+        <ui-rating class="heart"></ui-rating>
+        ```
+    ui-rating(class="heart")
+
+    h4: strong Size
+    :markdown
+        ```html
+        <ui-rating class="huge heart" max="7"></ui-rating>
+        ```
+    ui-rating(class="huge heart" max="7")
