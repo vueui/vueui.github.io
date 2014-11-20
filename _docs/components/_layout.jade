@@ -17,8 +17,9 @@ html
     script(src="../../assets/highlight.pack.js")
     script hljs.initHighlightingOnLoad();
 
-  body#app.ui.page.grid
-    .ui.row.grid
+    script(src="../examples/main.js")
+  body#app
+    .ui.grid
       .two.wide.column
         != partial("../_shared/_menu")
 
@@ -27,5 +28,4 @@ html
           h1= 'ui-' + current.path[1]
           != yield
 
-    script(src="../examples/main.js")
     script(src="../examples/#{ current.path[1] }.js")
