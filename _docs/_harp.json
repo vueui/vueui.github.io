@@ -1,6 +1,9 @@
 {
   "globals": {
     "title": "Vue-UI documentation",
+    "meta": {
+      "vue-version": "0.1.3"
+    },
     "components": [
       "accordion",
       "checkbox",
@@ -10,6 +13,16 @@
       "progress",
       "rating",
       "sidebar"
-    ]
+    ],
+    "usage": {
+      "files": {
+        "semantic.css": "The core CSS components of Semantic-UI",
+        "semantic-modules.css": "The CSS of the modules wrapped in Vue-UI",
+        "semantic-modules.js": "The Semantic-UI Javascript for the modules wrapped in Vue-UI"
+      },
+      "folders": {
+        "themes": "All the static assets like fonts, etc"
+      }
+    }
   }
 }

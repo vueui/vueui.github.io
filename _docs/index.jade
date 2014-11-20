@@ -1,8 +1,60 @@
 
+include _shared/_mixins
 
-.ui.row.grid
-    .three.wide.column
-        != partial("_shared/_menu")
+h1 Vue-UI documentation
 
-    .twelve.wide.column
-        .ui.raised.segment: h1 Vue-UI documentation
+h3 Getting started
+
+p Vue-UI uses a custom build of Semantic-UI#1.0, so you will need to
+ | include the following files found in the <a href="https://github.com/vueui/vue-ui/tree/master/dist" target="_blank">dist</a> folder:
+
+table.ui.celled.striped.table
+    thead: tr: th(colspan="2") Vue-UI dist
+    tbody
+        each description, path in usage.folders
+            tr
+                +folder(path)
+                td #{ description }
+        each description, name in usage.files
+            tr
+                +file(name)
+                td #{ description }
+
+:markdown
+    Semantic-UI depends on jQuery, so you will need to add it:
+    ```js
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script>
+    ```
+
+    Next you need to install the ```vue-ui``` NPM package:
+    ```bash
+    npm install --save vue-ui
+    ```
+
+    You can now consume it as a Vue.js plugin in your project:
+    ```js
+    var Vue = require('vue')
+    var vueUI = require('vue-ui')
+
+    Vue.use(vueUI)
+    ```
+
+    Once you've done that, you can use any of the components:
+    ```js
+    var Progress = Vue.component('ui-progress')
+    var transcoding = new Progress().$mount('#transcoding')
+
+    transcoding.$increment(20) // Increment the progress by 20%
+    ```
+
+    Of course the components(ex. ui-progress) can also be used with the Web Component syntax:
+    ```html
+    <div id="app">
+        <ui-progress v-ref="progress"></ui-progress>
+    </div>
+    ```
+    ```js
+    var app = new Vue({ el: '#app' })
+
+    app.$.progress.$increment(20)
+    ```

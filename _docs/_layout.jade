@@ -18,4 +18,11 @@ html
     script hljs.initHighlightingOnLoad();
 
   body
-    != yield
+    .ui.grid
+      .three.wide.column
+        != partial("_shared/_menu")
+
+      .twelve.wide.column
+        .ui.raised.segment
+          != yield
+
